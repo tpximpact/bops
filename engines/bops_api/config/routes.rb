@@ -33,6 +33,7 @@ BopsApi::Engine.routes.draw do
         resources :planning_applications, only: [:show] do
           get :search, on: :collection
           resource :documents, only: [:show]
+          resource :comments, only: [:show]
         end
       end
     end
