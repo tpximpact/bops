@@ -34,6 +34,7 @@ BopsApi::Engine.routes.draw do
           get :search, on: :collection
           resource :documents, only: [:show]
           resource :comments, only: [:show]
+          resource :specialist, only: [:show]
         end
       end
     end
