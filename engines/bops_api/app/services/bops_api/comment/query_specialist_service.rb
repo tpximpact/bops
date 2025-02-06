@@ -19,15 +19,13 @@ module BopsApi
 
       def search
         return scope if query.blank?
-
         search_comment
       end
 
       def apply_filtering(scope)
         sort_by = params[:sort_by] || 'received_at'
         order = params[:order] || "desc"
-
-        scope.order("#{sort_by} #{order}")
+        scope.reorder("#{sort_by} #{order}")
       end
 
       def search_comment
