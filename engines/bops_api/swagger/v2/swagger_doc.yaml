@@ -33590,6 +33590,8 @@ paths:
           description: returns a public comments given a reference
           content:
             application/json:
+            schema:
+                "$ref": "#/components/schemas/Comments"
               examples:
                 default:
                   value:
@@ -33659,6 +33661,8 @@ paths:
           description: returns a specialist comment given a reference
           content:
             application/json:
+            schema:
+                "$ref": "#/components/schemas/Comments"
               examples:
                 default:
                   value:
