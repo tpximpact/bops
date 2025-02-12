@@ -1,56 +1,69 @@
-# spec/controllers/bops_api/v2/public/comments_public_controller_spec.rb
+# frozen_string_literal: true
 
-require 'rails_helper'
+require "swagger_helper"
 
-RSpec.describe BopsApi::V2::Public::CommentsSpecialistController, type: :controller do
-  render_views
-
-  let(:local_authority) { create(:local_authority) }
-  let(:consultee_responses) do
-    create_list(:consultee_response, 3, local_authority:)
-
-  before do
-    # Assume authenticated controller and set current_local_authority for testing
-    allow_any_instance_of(described_class).to receive(:current_local_authority).and_return(local_authority)
+RSpec.describe "BOPS public API" do
+  let(:local_authority) { create(:local_authority, :default) }
+  let!(:planning_application) do
+    create(
+      :planning_application,
+      :published,
+      :in_assessment,
+      :with_boundary_geojson,
+      :planning_permission,
+      local_authority:
+    )
   end
 
-  describe 'GET #show' do
-    it 'returns a successful response with paginated results' do
-      # Creating sample consultee responses
-      consultee_responses
+  let!(:consultation) do
+    planning_application.consultation
+  end
 
-      get :show, params: { format: :json, page: 1, maxresults: 2 }
+  let!(:alice_smith) do
+    create(:consultee, :internal, :with_response, name: "Alice Smith", consultation:)
+  end
 
-      expect(response).to have_http_status(:success)
-      json_response = JSON.parse(response.body)
-      
-      expect(json_response["data"].size).to eq(2)
-    end
+  let!(:bella_jones) do
+    create(:consultee, :external, :with_response, name: "Bella Jones", consultation:)
+  end
 
-    it 'returns results sorted by received_at in ascending order' do
-      create(:consultee_response, received_at: 2.days.ago, local_authority:)
-      create(:consultee_response, received_at: 1.day.ago, local_authority:)
+  path "/api/v2/public/planning_applications/{reference}/comments/specialist" do
+    get "Retrieves comments for a planning application" do
+      tags "Planning applications"
+      produces "application/json"
 
-      get :show, params: { sort_by: 'received_at', order: 'asc', format: :json }
+      parameter name: :reference, in: :path, schema: {
+        type: :string,
+        description: "The planning application reference"
+      }
 
-      json_response = JSON.parse(response.body)
-      received_dates = json_response["data"].map { |resp| resp["received_at"].to_date }
+      parameter name: :sort_by, in: :path, schema: {
+        type: :string,
+        description: "The sort type for the comments"
+      }
 
-      expect(received_dates).to eq(received_dates.reorder("asc"))
-    end
+      parameter name: :order, in: :path, schema: {
+        type: :string,
+        description: "The order for the comments"
+      }
 
-    it 'filters based on query parameter' do
-      create(:consultee_response, redacted_response: "Specific text", local_authority:)
-      create(:consultee_response, redacted_response: "Unrelated", local_authority:)
+      response "200", "returns a planning application's specialist comments given a reference" do
+        example "application/json", :default, example_fixture("comments.json")
+        schema "$ref" => "#/components/schemas/Comments"
 
-      get :show, params: { q: 'Specific', format: :json }
+        let(:reference) { planning_application.reference }
+        let(:sort_by) { 'received_at' }
+        let(:order) { 'desc' }
 
-      json_response = JSON.parse(response.body)
-      responses = json_response["data"]
+        run_test! do |response|
+          data = JSON.parse(response.body)
+          puts data.inspect
+          expect(data["metadata"]["totalResults"]).to eq(2)
+          expect(data["data"].count).to eq(2)
+        end
 
-      expect(responses.size).to eq(1)
-      expect(responses.first["redacted_response"]).to include("Specific text")
+      end
+
     end
   end
-end
 end
