@@ -29,6 +29,7 @@ FactoryBot.define do
       short_name { "PlanX" }
       council_name { "PlanX Council" }
       applicants_url { "https://planx.bops-applicants.services" }
+      public_register_base_url { "https://planningregister.org/planx" }
       signatory_name { Faker::FunnyName.two_word_name }
       signatory_job_title { "Director" }
       enquiries_paragraph { Faker::Lorem.unique.sentence }
@@ -63,6 +64,28 @@ FactoryBot.define do
       email_address { "planning@southwark.gov.uk" }
       feedback_email { "feedback_email@southwark.gov.uk" }
       email_reply_to_id { "f755c178-b01a-4323-a756-d669e9350c33" }
+    end
+
+    trait :barnet do
+      council_code { "BAR" }
+      subdomain { "barnet" }
+      short_name { "Barnet" }
+      council_name { "Barnet Council" }
+      applicants_url { "https://planningapplications.barnet.gov.uk" }
+      signatory_name { Faker::FunnyName.two_word_name }
+      signatory_job_title { "Director of Planning and Growth" }
+      enquiries_paragraph { Faker::Lorem.unique.sentence }
+      email_address { Faker::Internet.email }
+      feedback_email { nil }
+      email_reply_to_id { nil }
+    end
+
+    trait :unconfigured do
+      press_notice_email { nil }
+      notify_api_key { nil }
+      letter_template_id { nil }
+      reviewer_group_email { nil }
+      active { false }
     end
 
     trait :with_api_user do
