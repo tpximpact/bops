@@ -16,6 +16,7 @@ RSpec.configure do |config|
   application_submission_json = BopsApi::Schemas.find!("applicationSubmission", version:).value
   documents_json = BopsApi::Schemas.find!("documents", version:).value
   neighbour_responses_json = BopsApi::Schemas.find!("neighbourResponses", version:).value
+  comments_json = BopsApi::Schemas.find!("comments", version:).value
   validation_requests_json = BopsApi::Schemas.find!("validationRequests", version:).value
   shared_definitions_json = BopsApi::Schemas.find!("shared/definitions", version:).value
 
@@ -45,6 +46,8 @@ RSpec.configure do |config|
   documents = documents_json.slice(*keys).deep_transform_values(&transformer)
 
   neighbour_responses = neighbour_responses_json.slice(*keys).deep_transform_values(&transformer)
+
+  comments = comments_json.slice(*keys).deep_transform_values(&transformer)
 
   validation_requests = validation_requests_json.slice(*keys).deep_transform_values(&transformer)
 
@@ -90,6 +93,8 @@ RSpec.configure do |config|
           NeighbourResponses: neighbour_responses,
 
           ValidationRequests: validation_requests,
+
+          Comments: comments,
 
           Healthcheck: {
             type: "object",
