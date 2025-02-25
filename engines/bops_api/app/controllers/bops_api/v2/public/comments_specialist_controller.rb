@@ -18,7 +18,7 @@ module BopsApi
                     current_local_authority.consultee_responses.select(:id, :redacted_response, :received_at, :summary_tag)
                 end
                 def search_params
-                    params.permit(:page, :maxresults, :q, :sort_by, :order)
+                    params.permit(:page, :maxresults, :q, :sortBy, :orderBy)
                 end
                 def query_service(scope = response_scope)
                     @query_service ||= Comment::QuerySpecialistService.new(scope, search_params)
