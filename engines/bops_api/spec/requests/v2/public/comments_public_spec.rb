@@ -26,6 +26,10 @@ RSpec.describe "BOPS public API" do
         type: :string,
         description: "The order for the comments"
       }
+     parameter name: :maxResult, in: :path, schema: {
+        type: :string,
+        description: "Max result for page"
+      }
 
       response "200", "returns a planning application's specialist comments given a reference" do
         example "application/json", :default, example_fixture("comments.json")

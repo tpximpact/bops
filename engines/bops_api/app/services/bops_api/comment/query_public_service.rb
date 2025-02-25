@@ -24,8 +24,8 @@ module BopsApi
       end
 
       def apply_filtering(scope)
-        sort_by = params[:sort_by] || 'received_at'
-        order = params[:order] || "desc"
+        sort_by = params[:sortBy] || 'received_at'
+        order = params[:orderBy] || "desc"
 
         scope.order("#{sort_by} #{order}")
       end
