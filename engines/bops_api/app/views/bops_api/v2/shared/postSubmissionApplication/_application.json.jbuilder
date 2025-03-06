@@ -1,7 +1,7 @@
-json.application do #check ApplicationVariant
+json.application do 
     json.reference planning_application.reference
-    json.stage "null" #?? current stage of application  | submission | validation | consultation | assessment | appeal | highCourtAppeal;
-    json.status planning_application.status #tobe confirm | returned | withdrawn | determined | undetermined;
+    json.stage planning_application.planning_stage
+    json.status planning_application.planning_status
     json.withdrawnAt planning_application.withdrawn_at
-    # json.withdrawnReason planning_application.withdrawn_or_cancellation_comment
+    json.withdrawnReason "null"
   end
