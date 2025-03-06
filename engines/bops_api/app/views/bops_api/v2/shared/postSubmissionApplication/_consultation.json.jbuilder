@@ -1,4 +1,4 @@
-  json.consultation do #condition is not obligate is it comming from consultations tab
-    json.startDate json.started_at
-    json.endDate json.closed_at #tobe confirmed
+  json.consultation do
+    json.startDate planning_application.consultation.started_at
+    json.endDate planning_application.consultation.end_date
   end
