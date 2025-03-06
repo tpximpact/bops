@@ -945,6 +945,75 @@ class PlanningApplication < ApplicationRecord
     pre_application? ? "pre-application" : "application"
   end
 
+  def planning_stage
+    case status
+    when "pending"
+      "submission"
+    when "not_started"
+      "submission"
+    when "invalid"
+      "validation"
+    when "returned"
+      "validation"
+    when "in_committee"
+      "consultation"
+    when "assessment_in_progress"
+      "consultation"
+    when "in_assessment"
+      "consultation"
+    when "awaiting_determination"
+      "consultation"
+    when "to_be_reviewed"
+      "consultation"
+    when "determined"
+      "assessment"
+    when "appeal"
+      "appeal"
+    end
+  end
+
+  def planning_status
+    case status
+    when "pending"
+      "undetermined"
+    when "not_started"
+      "undetermined"
+    when "invalid"
+      "returned"
+    when "returned"
+      "returned"
+    when "in_committee"
+      "undertermined"
+    when "assessment_in_progress"
+      "undertermined"
+    when "in_assessment"
+      "undertermined"
+    when "awaiting_determination"
+      "undertermined"
+    when "to_be_reviewed"
+      "undertermined"
+    when "determined"
+      "determined"
+    when "appeal"
+      "determined"
+    end
+  end
+
+  def prior_approval_required
+    if application_type.category == "prior_approval" and decision == "granted" or decision == "refused"
+      true
+    else false
+    end 
+  end
+
+  def is_valid_application
+    if status === "returned"
+      return false
+    else true
+    end
+  end
+
+
   private
 
   def create_fee_calculation
