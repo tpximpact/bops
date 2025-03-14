@@ -17,13 +17,13 @@ RSpec.describe "BOPS public API" do
         description: "The planning application reference"
       }
 
-      parameter name: :sortBy, in: :path, schema: {
+      parameter name: :sortBy, in: :query, schema: {
         type: :string,
         default: "received_at",
         description: "The sort type for the comments"
       }, required: false
 
-      parameter name: :order, in: :path, schema: {
+      parameter name: :orderBy, in: :query, schema: {
         type: :string,
         default: "asc",
         description: "The order for the comments"
@@ -51,7 +51,7 @@ RSpec.describe "BOPS public API" do
 
         let(:page) { 1 }
         let(:sortBy) { 'received_at' }
-        let(:order) { 'desc' }
+        let(:orderBy) { 'desc' }
 
         run_test! do |response|
           data = JSON.parse(response.body)

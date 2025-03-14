@@ -6,14 +6,14 @@ module BopsApi
       def initialize(scope, params)
         @scope = scope
         @params = params
-        @query = params[:q]
+        @query = params[:query]
       end
 
       attr_reader :scope, :params, :query
 
       def call
         Pagination.new(scope: apply_filtering(search), params: params).paginate
-      end
+      end 
 
       private
 
@@ -24,9 +24,9 @@ module BopsApi
       end
 
       def apply_filtering(scope)
-        sort_by = params[:sortBy] || 'received_at'
+        sort_by = params[:sortBy] || 'receivedAt'
         order = params[:orderBy] || "desc"
-
+        
         scope.order("#{sort_by} #{order}")
       end
 

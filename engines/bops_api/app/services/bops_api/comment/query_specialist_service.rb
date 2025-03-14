@@ -6,7 +6,7 @@ module BopsApi
       def initialize(scope, params)
         @scope = scope
         @params = params
-        @query = params[:q]
+        @query = params[:query]
       end
 
       attr_reader :scope, :params, :query
@@ -23,7 +23,7 @@ module BopsApi
       end
 
       def apply_filtering(scope)
-        sort_by = params[:sortBy] || 'received_at'
+        sort_by = params[:sortBy] || 'receivedAt'
         order = params[:orderBy] || "desc"
         scope.reorder("#{sort_by} #{order}")
       end
