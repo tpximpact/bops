@@ -52,6 +52,7 @@ gem "store_model"
 gem "strong_migrations"
 gem "strong_password", "~> 0.0.9"
 gem "view_component"
+gem 'active_model_serializers'
 
 # These gems are included to fix deprecation warnings
 gem "csv"

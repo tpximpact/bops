@@ -14,6 +14,7 @@ require "action_mailbox/engine"
 require "action_view/railtie"
 require "grover"
 require "sprockets/railtie"
+require 'active_model_serializers'
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.

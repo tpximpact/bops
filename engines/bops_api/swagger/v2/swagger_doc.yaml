@@ -33280,19 +33280,17 @@ paths:
           description: The planning application reference
         required: true
       - name: sortBy
-        in: path
+        in: query
         schema:
           type: string
           default: received_at
           description: The sort type for the comments
-        required: true
-      - name: order
-        in: path
+      - name: orderBy
+        in: query
         schema:
           type: string
           default: asc
           description: The order for the comments
-        required: true
       - name: maxresults
         in: query
         schema:
@@ -33306,6 +33304,18 @@ paths:
           type: integer
           default: 1
         required: false
+      - name: resultsPerPage
+        in: query
+        schema:
+          type: integer
+          default: 1
+        required: false
+      - name: query
+        in: query
+        schema:
+          type: string
+        required: false
+      
       responses:
         '200':
           description: returns a planning application's specialist comments given
@@ -33355,14 +33365,14 @@ paths:
           description: The planning application reference
         required: true
       - name: sortBy
-        in: path
+        in: query
         schema:
           type: string
           default: received_at
           description: The sort type for the comments
         required: true
-      - name: order
-        in: path
+      - name: orderBy
+        in: query
         schema:
           type: string
           default: asc
@@ -33380,6 +33390,17 @@ paths:
         schema:
           type: integer
           default: 1
+        required: false
+      - name: resultsPerPage
+        in: query
+        schema:
+          type: integer
+          default: 1
+        required: false
+      - name: query
+        in: query
+        schema:
+          type: string
         required: false
       responses:
         '200':
