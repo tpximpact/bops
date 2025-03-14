@@ -52,13 +52,39 @@ RSpec.describe "BOPS public API" do
         let(:page) { 1 }
         let(:sortBy) { 'received_at' }
         let(:orderBy) { 'desc' }
+        let(:resultsPerPage) { 2 }
 
         run_test! do |response|
           data = JSON.parse(response.body)
           puts data.inspect
           expect(data["metadata"]["totalResults"]).to eq(1)
           expect(data["metadata"]["page"]).to eq(1)
+          expect(data["metadata"]["results"]).to eq(2)
           expect(data["data"].count).to eq(1)
+        end
+
+      end
+
+      response "200", "returns a planning application's public comments given a reference sortBy id and orderBy asc" do
+        example "application/json", :default, example_fixture("comments.json")
+        schema "$ref" => "#/components/schemas/Comments"
+        let(:reference) { planning_application.reference }
+        let(:planning_application) { create(:planning_application, :published, local_authority:, application_type:) }
+        before do
+          create(:neighbour_response, neighbour: create(:neighbour, consultation: planning_application.consultation))
+        end
+
+        let(:page) { 1 }
+        let(:sortBy) { 'id' }
+        let(:orderBy) { 'asc' }
+        let(:query) { 'like' }
+
+        run_test! do |response|
+          data = JSON.parse(response.body)
+          puts data.inspect
+          expect(data["metadata"]["totalResults"]).to eq(1)
+          expect(data["metadata"]["page"]).to eq(1)
+          expect(data["data"].first["comment"]).to include('I like it')
         end
 
       end

@@ -7,5 +7,4 @@
 #     http_host: 'example.org',
 #     https: false
 #   )
-# end
-ActiveModelSerializers.config.key_transform = :camel_lower
+
