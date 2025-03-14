@@ -17,7 +17,7 @@ module BopsApi
 
     def paginate
       page = (params[:page] || DEFAULT_PAGE).to_i.clamp(1, 1000)
-      maxresults = [(params[:resultsPerPage]|| DEFAULT_MAXRESULTS).to_i, MAXRESULTS_LIMIT].min.clamp(1, 1000)
+      maxresults = [(params[:resultsPerPage]|| params[:maxresults]|| DEFAULT_MAXRESULTS).to_i, MAXRESULTS_LIMIT].min.clamp(1, 1000)
 
       pagy(scope, page:, limit: maxresults, overflow: :last_page)
     end

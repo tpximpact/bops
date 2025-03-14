@@ -78,6 +78,25 @@ RSpec.describe "BOPS public API" do
         end
 
       end
+      response "200", "returns a planning application's specialist comments given a reference sortBy id and orderBy asc" do
+        example "application/json", :default, example_fixture("comments.json")
+        schema "$ref" => "#/components/schemas/Comments"
+
+        let(:reference) { planning_application.reference }
+        let(:sortBy) { 'id' }
+        let(:order) { 'asc' }
+        let(:page) { 1 }
+        let(:query) { '' }
+
+        run_test! do |response|
+          data = JSON.parse(response.body)
+          puts data.inspect
+          expect(data["metadata"]["totalResults"]).to eq(2)
+          expect(data["metadata"]["page"]).to eq(1)
+          expect(data["data"].first["id"]).to be > data["data"].second["id"]
+        end
+
+      end
 
     end
   end
