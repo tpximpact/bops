@@ -18,7 +18,7 @@ module BopsApi
                     current_local_authority.neighbour_responses.select(:id, :redacted_response, :received_at, :summary_tag)
                 end
                 def search_params
-                    params.permit(:page, :maxresults, :query, :sortBy, :orderBy, :resultsPerPage)
+                    params.permit(:page, :query, :sortBy, :orderBy, :resultsPerPage)
                 end
                 def query_service(scope = response_scope)
                     @query_service ||= Comment::QueryPublicService.new(scope, search_params)

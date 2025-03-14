@@ -33291,7 +33291,7 @@ paths:
           type: string
           default: asc
           description: The order for the comments
-      - name: maxresults
+      - name: resultsPerPage
         in: query
         schema:
           type: integer
@@ -33299,12 +33299,6 @@ paths:
           description: Max result for page
         required: false
       - name: page
-        in: query
-        schema:
-          type: integer
-          default: 1
-        required: false
-      - name: resultsPerPage
         in: query
         schema:
           type: integer
@@ -33378,7 +33372,7 @@ paths:
           default: asc
           description: The order for the comments
         required: true
-      - name: maxresults
+      - name: resultsPerPage
         in: query
         schema:
           type: integer
@@ -33386,12 +33380,6 @@ paths:
           description: Max result for page
         required: false
       - name: page
-        in: query
-        schema:
-          type: integer
-          default: 1
-        required: false
-      - name: resultsPerPage
         in: query
         schema:
           type: integer
