@@ -49,7 +49,7 @@ RSpec.describe "BOPS public API" do
         description: "The order for the comments"
       }, required: false
 
-      parameter name: :maxresults, in: :query, schema: {
+      parameter name: :resultsPerPage, in: :query, schema: {
         type: :integer,
         default: 10,
         description: "Max result for page"
