@@ -5,6 +5,8 @@ Rails.application.routes.draw do
 
   get :healthcheck, to: proc { [200, {}, %w[OK]] }
 
+  get "/map_proxy/(*path)", to: "map_proxy#proxy", as: "os_proxy"
+
   devise_subdomain do
     devise_for :users, controllers: {
       sessions: "users/sessions",
@@ -161,6 +163,8 @@ Rails.application.routes.draw do
             post :confirm, on: :collection
             concerns :positionable, module: :terms
           end
+
+          resources :requirements, only: %i[index edit update create]
 
           resources :recommendations, only: %i[new create update]
           resource :recommendations, only: %i[edit]
