@@ -15,7 +15,11 @@ module BopsApi
                 private
 
                 def response_scope
-                    current_local_authority.consultee_responses.select(:id, :redacted_response, :received_at, :summary_tag)
+                    current_local_authority.consultee_responses
+                        .joins(consultee: { consultation: :planning_application })
+                        .where(planning_applications: { reference: params[:planning_application_id] })
+                        .select(:id, :redacted_response, :received_at, :summary_tag)
+
                 end
                 def search_params
                     params.permit(:page, :query, :sortBy, :orderBy, :resultsPerPage)
