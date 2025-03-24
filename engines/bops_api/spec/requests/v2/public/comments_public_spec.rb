@@ -39,7 +39,7 @@ RSpec.describe "BOPS public API" do
         default: 1
       }, required: false
 
-      response "200", "returns a planning application's specialist comments given a reference" do
+      response "200", "returns a planning application's public comments given a reference" do
         example "application/json", :default, example_fixture("public/comments.json")
         schema "$ref" => "#/components/schemas/Comments"
         let(:reference) { planning_application.reference }
