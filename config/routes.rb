@@ -138,6 +138,8 @@ Rails.application.routes.draw do
             end
           end
 
+          resource :recommended_application_type, only: %i[show edit update]
+
           resource :permitted_development_rights, only: %i[show edit update]
 
           namespace :policy_areas do
@@ -175,7 +177,7 @@ Rails.application.routes.draw do
             end
           end
 
-          resources :consideration_guidances, only: %i[index create destroy]
+          resources :consideration_guidances, except: %i[show]
 
           resource :informatives, only: %i[create show edit update] do
             resources :items, only: %i[edit update destroy], module: :informatives do

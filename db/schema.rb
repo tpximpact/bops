@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_03_17_171204) do
+ActiveRecord::Schema[7.2].define(version: 2025_03_21_121622) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "plpgsql"
@@ -103,6 +103,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_17_171204) do
     t.string "category"
     t.string "reporting_types", default: [], null: false, array: true
     t.string "decisions", default: [], null: false, array: true
+    t.string "disclaimer"
     t.index ["code"], name: "ix_application_type_configs_on_code", unique: true, where: "((status)::text <> 'retired'::text)"
     t.index ["legislation_id"], name: "ix_application_type_configs_on_legislation_id"
     t.index ["suffix"], name: "ix_application_type_configs_on_suffix", unique: true
@@ -128,9 +129,15 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_17_171204) do
     t.string "category"
     t.string "reporting_types", default: [], null: false, array: true
     t.string "decisions", default: [], null: false, array: true
-    t.index ["code"], name: "ix_application_types_on_code", unique: true, where: "((status)::text <> 'retired'::text)"
+    t.bigint "config_id"
+    t.bigint "local_authority_id"
+    t.string "disclaimer"
+    t.index ["config_id"], name: "ix_application_types_on_config_id"
     t.index ["legislation_id"], name: "ix_application_types_on_legislation_id"
-    t.index ["suffix"], name: "ix_application_types_on_suffix", unique: true
+    t.index ["local_authority_id", "code"], name: "ix_application_types_on_local_authority_id__code", unique: true, where: "((status)::text <> 'retired'::text)"
+    t.index ["local_authority_id", "config_id"], name: "ix_application_types_on_local_authority_id__config_id", unique: true
+    t.index ["local_authority_id", "suffix"], name: "ix_application_types_on_local_authority_id__suffix", unique: true
+    t.index ["local_authority_id"], name: "ix_application_types_on_local_authority_id"
   end
 
   create_table "assessment_details", force: :cascade do |t|
@@ -229,7 +236,9 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_17_171204) do
     t.bigint "submitted_by_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["consideration_set_id", "policy_area"], name: "ix_considerations_on_consideration_set_id__policy_area", unique: true
+    t.string "proposal"
+    t.string "summary_tag"
+    t.boolean "draft", default: false, null: false
     t.index ["consideration_set_id"], name: "ix_considerations_on_consideration_set_id"
     t.index ["submitted_by_id"], name: "ix_considerations_on_submitted_by_id"
   end
@@ -907,6 +916,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_17_171204) do
     t.virtual "address_search", type: :tsvector, as: "to_tsvector('simple'::regconfig, (((((((((COALESCE(address_1, ''::character varying))::text || ' '::text) || (COALESCE(address_2, ''::character varying))::text) || ' '::text) || (COALESCE(town, ''::character varying))::text) || ' '::text) || (COALESCE(county, ''::character varying))::text) || ' '::text) || (COALESCE(postcode, ''::character varying))::text))", stored: true
     t.datetime "deleted_at"
     t.string "previous_references", default: [], array: true
+    t.string "reporting_type_code"
+    t.bigint "recommended_application_type_id"
     t.index "lower((reference)::text)", name: "ix_planning_applications_on_lower_reference"
     t.index "lower(replace((postcode)::text, ' '::text, ''::text))", name: "ix_planning_applications_on_LOWER_replace_postcode"
     t.index "to_tsvector('english'::regconfig, description)", name: "index_planning_applications_on_description", using: :gin
@@ -918,6 +929,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_17_171204) do
     t.index ["deleted_at"], name: "ix_planning_applications_on_deleted_at"
     t.index ["local_authority_id"], name: "index_planning_applications_on_local_authority_id"
     t.index ["lonlat"], name: "ix_planning_applications_on_lonlat", using: :gist
+    t.index ["recommended_application_type_id"], name: "ix_planning_applications_on_recommended_application_type_id"
     t.index ["reference", "local_authority_id"], name: "ix_planning_applications_on_reference__local_authority_id", unique: true
     t.index ["status", "application_type_id"], name: "ix_planning_applications_on_status__application_type_id"
     t.index ["status"], name: "ix_planning_applications_on_status"
@@ -1170,7 +1182,9 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_17_171204) do
   add_foreign_key "api_users", "local_authorities"
   add_foreign_key "appeals", "planning_applications"
   add_foreign_key "application_type_configs", "legislation"
+  add_foreign_key "application_types", "application_type_configs", column: "config_id"
   add_foreign_key "application_types", "legislation"
+  add_foreign_key "application_types", "local_authorities"
   add_foreign_key "assessment_details", "planning_applications"
   add_foreign_key "assessment_details", "users"
   add_foreign_key "audits", "api_users"
@@ -1238,6 +1252,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_17_171204) do
   add_foreign_key "planning_application_policy_sections", "policy_sections"
   add_foreign_key "planning_application_requirements", "planning_applications"
   add_foreign_key "planning_applications", "api_users"
+  add_foreign_key "planning_applications", "application_types"
+  add_foreign_key "planning_applications", "application_types", column: "recommended_application_type_id"
   add_foreign_key "planning_applications", "local_authorities"
   add_foreign_key "planning_applications", "users"
   add_foreign_key "planning_applications", "users", column: "boundary_created_by_id"

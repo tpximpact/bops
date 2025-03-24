@@ -19,7 +19,7 @@ class PlanningApplication < ApplicationRecord
 
   self.discard_column = :deleted_at
 
-  self.ignored_columns += %i[work_status make_public]
+  self.ignored_columns += %i[work_status make_public reporting_type]
 
   DAYS_TO_EXPIRE = 56
   DAYS_TO_EXPIRE_EIA = 112
@@ -88,6 +88,7 @@ class PlanningApplication < ApplicationRecord
     delegate :appeals?
     delegate :assess_against_policies?
     delegate :consultation?
+    delegate :disclaimer
     delegate :neighbour_consultation_feature?
     delegate :consultee_consultation_feature?
     delegate :publicity_consultation_feature?
@@ -121,7 +122,8 @@ class PlanningApplication < ApplicationRecord
   belongs_to :api_user, optional: true
   belongs_to :boundary_created_by, class_name: "User", optional: true
   belongs_to :local_authority
-  belongs_to :application_type, class_name: "ApplicationType::Config"
+  belongs_to :application_type
+  belongs_to :recommended_application_type, class_name: "ApplicationType", optional: true
 
   scope :by_created_at_desc, -> { order(created_at: :desc) }
   scope :by_determined_at_desc, -> { order(determined_at: :desc) }
@@ -230,7 +232,11 @@ class PlanningApplication < ApplicationRecord
 
   with_options on: :reporting_types do
     validate :regulation_present, if: :regulation?
-    validates :reporting_type, presence: true, if: :selected_reporting_types?
+    validates :reporting_type_code, presence: true, if: :selected_reporting_types?
+  end
+
+  with_options on: :recommended_application_type do
+    validates :recommended_application_type, presence: true
   end
 
   with_options on: :update, if: -> { changes.present? && !status_changed? } do
@@ -843,7 +849,7 @@ class PlanningApplication < ApplicationRecord
   end
 
   def reporting_type_status
-    reporting_type.blank? ? :not_started : :complete
+    reporting_type_code.blank? ? :not_started : :complete
   end
 
   def updated_neighbour_boundary_geojson
@@ -916,7 +922,7 @@ class PlanningApplication < ApplicationRecord
   end
 
   def reporting_type_detail
-    @reporting_type_detail ||= application_type.selected_reporting_types.find_by(code: reporting_type)
+    @reporting_type_detail ||= application_type.selected_reporting_types.find_by(code: reporting_type_code)
   end
 
   def to_param
@@ -984,13 +990,7 @@ class PlanningApplication < ApplicationRecord
   end
 
   def application_type_determination_period
-    determination_period_days_for_pre_app ||
-      application_type.determination_period_days ||
-      DAYS_TO_EXPIRE
-  end
-
-  def determination_period_days_for_pre_app
-    local_authority.application_type_overrides.find { |ato| ato.code == "preApp" }&.determination_period_days if pre_application?
+    application_type.determination_period_days || DAYS_TO_EXPIRE
   end
 
   def set_change_access_id
@@ -1070,7 +1070,7 @@ class PlanningApplication < ApplicationRecord
   end
 
   def audit_update_application_type!
-    old_application_type = ApplicationType::Config.find(changes["application_type_id"].first)
+    old_application_type = ApplicationType.find(changes["application_type_id"].first)
     old_reference = reference
 
     transaction do
