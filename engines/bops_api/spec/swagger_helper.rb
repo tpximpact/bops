@@ -18,6 +18,7 @@ RSpec.configure do |config|
   neighbour_responses_json = BopsApi::Schemas.find!("neighbourResponses", version:).value
   validation_requests_json = BopsApi::Schemas.find!("validationRequests", version:).value
   shared_definitions_json = BopsApi::Schemas.find!("shared/definitions", version:).value
+  comments_json = BopsApi::Schemas.find!("comments", version:).value
 
   keys = %w[
     additionalProperties
@@ -47,6 +48,8 @@ RSpec.configure do |config|
   neighbour_responses = neighbour_responses_json.slice(*keys).deep_transform_values(&transformer)
 
   validation_requests = validation_requests_json.slice(*keys).deep_transform_values(&transformer)
+
+  comments = comments_json.slice(*keys).deep_transform_values(&transformer)
 
   config.openapi_specs = {
     "v2/swagger_doc.yaml" => {
@@ -90,6 +93,8 @@ RSpec.configure do |config|
           NeighbourResponses: neighbour_responses,
 
           ValidationRequests: validation_requests,
+
+          Comments: comments,
 
           Healthcheck: {
             type: "object",
