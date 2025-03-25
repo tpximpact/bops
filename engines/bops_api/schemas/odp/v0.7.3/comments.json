@@ -1,35 +1,35 @@
 {
-  "metadata": {
-    "page": 1,
-    "results": 10,
-    "from": 1,
-    "to": 3,
+  "pagination": {
+    "resultsPerPage": 10,
+    "currentPage": 1,
     "totalPages": 1,
-    "totalResults": 3
+    "totalItems": 4
   },
-  "links": {
-    "first": "http://southwark.bops.localhost:3000/api/v2/public/planning_applications/25-00005-HAPP/comments/specialist?maxresults=10&sort_by=id&order=desc&page=1",
-    "last": "http://southwark.bops.localhost:3000/api/v2/public/planning_applications/25-00005-HAPP/comments/specialist?maxresults=10&sort_by=id&order=desc&page=1",
-    "prev": null,
-    "next": null
+   "summary": {
+    "totalComments": 4,
+    "sentiment": {
+      "supportive": 1,
+      "objection": 1,
+      "neutral": 2
+    }
   },
-  "data": [
+  "comments": [
     {
       "id": 1,
-      "text": "first comment",
       "sentiment": "approved",
+      "comment": "first comment",
       "receivedAt": "2025-01-22T08:57:17.168+00:00"
     },
     {
       "id": 2,
-      "text": "second comment",
       "sentiment": "approved",
+      "comment": "second comment",
       "receivedAt": "2025-01-23T10:57:17.168+00:00"
     },
     {
       "id": 3,
-      "text": "this is a test",
       "sentiment": "approved",
+      "comment": "this is a test",
       "receivedAt": "2025-01-24T09:57:17.168+00:00"
     }
   ]

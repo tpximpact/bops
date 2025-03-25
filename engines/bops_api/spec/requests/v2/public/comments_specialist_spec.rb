@@ -19,14 +19,9 @@ RSpec.describe "BOPS public API" do
     planning_application.consultation
   end
 
-let!(:alice_smith) do
-  consultee = create(:consultee, :internal, name: "Alice Smith", consultation:)
-  response = create(:consultee_response, consultee: consultee)
-  puts "Created consultee: #{consultee.inspect}"
-  puts "Created response: #{response.inspect}"
-  consultee
-end
-
+  let!(:alice_smith) do
+      create(:consultee, :internal, :with_response, name: "Alice Smith", consultation:)
+  end
 
   let!(:bella_jones) do
     create(:consultee, :external, :with_response, name: "Bella Jones", consultation:)
@@ -73,7 +68,6 @@ end
         let(:sortBy) { 'received_at' }
         let(:order) { 'desc' }
         let(:page) { 1 }
-
 
         run_test! do |response|
           data = JSON.parse(response.body)
