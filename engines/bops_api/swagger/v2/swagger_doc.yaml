@@ -21462,6 +21462,7 @@ components:
       - links
       - data
       type: object
+    Comments: {}
     Healthcheck:
       type: object
       properties:
@@ -34971,6 +34972,156 @@ paths:
                             country: ''
               schema:
                 "$ref": "#/components/schemas/Search"
+  "/api/v2/public/planning_applications/{reference}/comments/public":
+    get:
+      summary: Retrieves comments for a planning application
+      tags:
+      - Planning applications
+      parameters:
+      - name: reference
+        in: path
+        schema:
+          type: string
+          description: The planning application reference
+        required: true
+      - name: sortBy
+        in: query
+        schema:
+          type: string
+          default: received_at
+          description: The sort type for the comments
+        required: false
+      - name: orderBy
+        in: query
+        schema:
+          type: string
+          default: asc
+          description: The order for the comments
+        required: false
+      - name: resultsPerPage
+        in: query
+        schema:
+          type: integer
+          default: 10
+          description: Max result for page
+        required: false
+      - name: page
+        in: query
+        schema:
+          type: integer
+          default: 1
+        required: false
+      responses:
+        '200':
+          description: returns a planning application's public comments given a reference
+            sortBy id and orderBy asc
+          content:
+            application/json:
+              examples:
+                default:
+                  value:
+                    metadata:
+                      page: 1
+                      results: 10
+                      from: 1
+                      to: 3
+                      totalPages: 1
+                      totalResults: 3
+                    links:
+                      first: http://southwark.bops.localhost:3000/api/v2/public/planning_applications/25-00005-HAPP/comments/specialist?maxresults=10&sort_by=id&order=desc&page=1
+                      last: http://southwark.bops.localhost:3000/api/v2/public/planning_applications/25-00005-HAPP/comments/specialist?maxresults=10&sort_by=id&order=desc&page=1
+                      prev:
+                      next:
+                    data:
+                    - id: 1
+                      text: first comment
+                      sentiment: approved
+                      receivedAt: '2025-01-22T08:57:17.168+00:00'
+                    - id: 2
+                      text: second comment
+                      sentiment: approved
+                      receivedAt: '2025-01-23T10:57:17.168+00:00'
+                    - id: 3
+                      text: this is a test
+                      sentiment: approved
+                      receivedAt: '2025-01-24T09:57:17.168+00:00'
+              schema:
+                "$ref": "#/components/schemas/Comments"
+  "/api/v2/public/planning_applications/{reference}/comments/specialist":
+    get:
+      summary: Retrieves comments for a planning application
+      tags:
+      - Planning applications
+      parameters:
+      - name: reference
+        in: path
+        schema:
+          type: string
+          description: The planning application reference
+        required: true
+      - name: sortBy
+        in: query
+        schema:
+          type: string
+          default: received_at
+          description: The sort type for the comments
+        required: false
+      - name: order
+        in: query
+        schema:
+          type: string
+          default: asc
+          description: The order for the comments
+        required: false
+      - name: resultsPerPage
+        in: query
+        schema:
+          type: integer
+          default: 10
+          description: Max result for page
+        required: false
+      - name: page
+        in: query
+        schema:
+          type: integer
+          default: 1
+        required: false
+      responses:
+        '200':
+          description: returns a planning application's specialist comments given
+            a reference sortBy id and orderBy asc
+          content:
+            application/json:
+              examples:
+                default:
+                  value:
+                    metadata:
+                      page: 1
+                      results: 10
+                      from: 1
+                      to: 3
+                      totalPages: 1
+                      totalResults: 3
+                    links:
+                      first: http://southwark.bops.localhost:3000/api/v2/public/planning_applications/25-00005-HAPP/comments/specialist?maxresults=10&sort_by=id&order=desc&page=1
+                      last: http://southwark.bops.localhost:3000/api/v2/public/planning_applications/25-00005-HAPP/comments/specialist?maxresults=10&sort_by=id&order=desc&page=1
+                      prev:
+                      next:
+                    data:
+                    - id: 1
+                      text: first comment
+                      sentiment: approved
+                      receivedAt: '2025-01-22T08:57:17.168+00:00'
+                    - id: 2
+                      text: second comment
+                      sentiment: approved
+                      receivedAt: '2025-01-23T10:57:17.168+00:00'
+                    - id: 3
+                      text: this is a test
+                      sentiment: approved
+                      receivedAt: '2025-01-24T09:57:17.168+00:00'
+              schema:
+                "$ref": "#/components/schemas/Comments"
   "/api/v2/public/planning_applications/{reference}/documents":
     get:
       summary: Retrieves documents for a planning application
