@@ -150,6 +150,25 @@ RSpec.describe "BOPS public API" do
         end
       end
 
+      response "404", "does not return comments for unpublished planning applications" do
+
+        let(:reference) { planning_application.reference }
+
+        let(:planning_application) do
+          create(:planning_application, :in_assessment, local_authority:, application_type:) 
+        end
+
+        before do
+          create(:neighbour_response, neighbour: create(:neighbour, consultation: planning_application.consultation))
+        end
+
+        run_test! do |response|
+          data = JSON.parse(response.body)
+          
+          expect(data["error"]["message"]).to eq("Not Found")
+        end
+      end
+
       it "validates successfully against the example comments_public json" do
         resolved_schema = load_and_resolve_schema(name: "comments_public", version: BopsApi::Schemas::DEFAULT_ODP_VERSION)
         schemer = JSONSchemer.schema(resolved_schema)
