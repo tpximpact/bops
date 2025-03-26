@@ -39,13 +39,15 @@ RSpec.describe "BOPS public API" do
 
       parameter name: :sortBy, in: :query, schema: {
         type: :string,
-        default: "received_at",
+        enum: ["id", "receivedAt"],
+        default: "receivedAt",
         description: "The sort type for the comments"
       }, required: false
 
-      parameter name: :order, in: :query, schema: {
+      parameter name: :orderBy, in: :query, schema: {
         type: :string,
-        default: "asc",
+        enum: ["asc", "desc"],
+        default: "desc",
         description: "The order for the comments"
       }, required: false
 
@@ -60,9 +62,14 @@ RSpec.describe "BOPS public API" do
         default: 1
       }, required: false
 
+      parameter name: :query, in: :query, schema: {
+        type: :string,
+        description: "Search by redacted comment content"
+      }, required: false
+
       response "200", "returns a planning application's specialist comments given a reference" do
-        example "application/json", :default, example_fixture("public/comments.json")
-        schema "$ref" => "#/components/schemas/Comments"
+        example "application/json", :default, example_fixture("public/comments_specialist.json")
+        schema "$ref" => "#/components/schemas/CommentsSpecialistResponse"
 
         let(:reference) { planning_application.reference }
         let(:sortBy) { 'received_at' }
@@ -81,8 +88,8 @@ RSpec.describe "BOPS public API" do
 
       end
       response "200", "returns a planning application's specialist comments given a reference sortBy id and orderBy asc" do
-        example "application/json", :default, example_fixture("public/comments.json")
-        schema "$ref" => "#/components/schemas/Comments"
+        example "application/json", :default, example_fixture("public/comments_specialist.json")
+        schema "$ref" => "#/components/schemas/CommentsSpecialistResponse"
 
         let(:reference) { planning_application.reference }
         let(:sortBy) { 'id' }
