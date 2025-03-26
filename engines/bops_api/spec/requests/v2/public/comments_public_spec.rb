@@ -30,17 +30,17 @@ RSpec.describe "BOPS public API" do
         description: "The order for the comments"
       }, required: false
 
-     parameter name: :resultsPerPage, in: :query, schema: {
-        type: :integer,
-        default: 10,
-        description: "Max result for page"
-      }, required: false
+      parameter name: :resultsPerPage, in: :query, schema: {
+         type: :integer,
+         default: 10,
+         description: "Max result for page"
+       }, required: false
 
-     parameter name: :page, in: :query, schema: {
-        type: :integer,
-        default: 1
-      }, required: false
-     
+      parameter name: :page, in: :query, schema: {
+         type: :integer,
+         default: 1
+       }, required: false
+
       parameter name: :query, in: :query, schema: {
         type: :string,
         description: "Search by redacted comment content"
@@ -57,8 +57,8 @@ RSpec.describe "BOPS public API" do
         end
 
         let(:page) { 1 }
-        let(:sortBy) { 'received_at' }
-        let(:orderBy) { 'desc' }
+        let(:sortBy) { "receivedAt" }
+        let(:orderBy) { "desc" }
         let(:resultsPerPage) { 2 }
 
         run_test! do |response|
@@ -67,70 +67,67 @@ RSpec.describe "BOPS public API" do
           expect(data["pagination"]["currentPage"]).to eq(1)
           expect(data["pagination"]["resultsPerPage"]).to eq(2)
           expect(data["summary"]["totalComments"]).to eq(2)
-          sort_field = sortBy == "receivedAt" ? "receivedAt" : "id"
-          sorted_values = data["comments"].map { |c| c[sort_field] }
+          sort_field = (sortBy == "receivedAt") ? "receivedAt" : "id"
+          sorted_values = data["comments"].pluck(sort_field)
 
-          expected_order = orderBy == "asc" ? sorted_values.sort : sorted_values.sort.reverse
+          expected_order = (orderBy == "asc") ? sorted_values.sort : sorted_values.sort.reverse
           expect(sorted_values).to eq(expected_order)
         end
-
       end
 
         response "200", "returns a planning application's public comments filtering by sortBy" do
-        example "application/json", :default, example_fixture("public/comments_public.json")
-        schema "$ref" => "#/components/schemas/CommentsPublicResponse"
-        let(:reference) { planning_application.reference }
-        let(:planning_application) { create(:planning_application, :published, local_authority:, application_type:) }
-        before do
-          create(:neighbour_response, neighbour: create(:neighbour, consultation: planning_application.consultation))
-          create(:neighbour_response, neighbour: create(:neighbour, consultation: planning_application.consultation))
+          example "application/json", :default, example_fixture("public/comments_public.json")
+          schema "$ref" => "#/components/schemas/CommentsPublicResponse"
+          let(:reference) { planning_application.reference }
+          let(:planning_application) { create(:planning_application, :published, local_authority:, application_type:) }
+          before do
+            create(:neighbour_response, neighbour: create(:neighbour, consultation: planning_application.consultation))
+            create(:neighbour_response, neighbour: create(:neighbour, consultation: planning_application.consultation))
+          end
+
+          let(:sortBy) { "id" }
+          let(:orderBy) { "desc" }
+
+          run_test! do |response|
+            data = JSON.parse(response.body)
+            expect(data["pagination"]["totalItems"]).to eq(2)
+            expect(data["pagination"]["currentPage"]).to eq(1)
+            expect(data["pagination"]["resultsPerPage"]).to eq(10)
+            expect(data["summary"]["totalComments"]).to eq(2)
+            sort_field = (sortBy == "receivedAt") ? "receivedAt" : "id"
+            sorted_values = data["comments"].pluck(sort_field)
+
+            expected_order = (orderBy == "asc") ? sorted_values.sort : sorted_values.sort.reverse
+            expect(sorted_values).to eq(expected_order)
+          end
         end
-
-        let(:sortBy) { 'id' }
-        let(:orderBy) { 'desc' }
-
-        run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data["pagination"]["totalItems"]).to eq(2)
-          expect(data["pagination"]["currentPage"]).to eq(1)
-          expect(data["pagination"]["resultsPerPage"]).to eq(10)
-          expect(data["summary"]["totalComments"]).to eq(2)
-          sort_field = sortBy == "receivedAt" ? "receivedAt" : "id"
-          sorted_values = data["comments"].map { |c| c[sort_field] }
-
-          expected_order = orderBy == "asc" ? sorted_values.sort : sorted_values.sort.reverse
-          expect(sorted_values).to eq(expected_order)
-        end
-
-      end
 
         response "200", "returns a planning application's public comments filtering by orderBy" do
-        example "application/json", :default, example_fixture("public/comments_public.json")
-        schema "$ref" => "#/components/schemas/CommentsPublicResponse"
-        let(:reference) { planning_application.reference }
-        let(:planning_application) { create(:planning_application, :published, local_authority:, application_type:) }
-        before do
-          create(:neighbour_response, neighbour: create(:neighbour, consultation: planning_application.consultation))
-          create(:neighbour_response, neighbour: create(:neighbour, consultation: planning_application.consultation))
+          example "application/json", :default, example_fixture("public/comments_public.json")
+          schema "$ref" => "#/components/schemas/CommentsPublicResponse"
+          let(:reference) { planning_application.reference }
+          let(:planning_application) { create(:planning_application, :published, local_authority:, application_type:) }
+          before do
+            create(:neighbour_response, neighbour: create(:neighbour, consultation: planning_application.consultation))
+            create(:neighbour_response, neighbour: create(:neighbour, consultation: planning_application.consultation))
+          end
+
+          let(:sortBy) { "receivedAt" }
+          let(:orderBy) { "asc" }
+
+          run_test! do |response|
+            data = JSON.parse(response.body)
+            expect(data["pagination"]["totalItems"]).to eq(2)
+            expect(data["pagination"]["currentPage"]).to eq(1)
+            expect(data["pagination"]["resultsPerPage"]).to eq(10)
+            expect(data["summary"]["totalComments"]).to eq(2)
+            sort_field = (sortBy == "receivedAt") ? "receivedAt" : "id"
+            sorted_values = data["comments"].pluck(sort_field)
+
+            expected_order = (orderBy == "asc") ? sorted_values.sort : sorted_values.sort.reverse
+            expect(sorted_values).to eq(expected_order)
+          end
         end
-
-        let(:sortBy) { 'received_at' }
-        let(:orderBy) { 'asc' }
-
-        run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data["pagination"]["totalItems"]).to eq(2)
-          expect(data["pagination"]["currentPage"]).to eq(1)
-          expect(data["pagination"]["resultsPerPage"]).to eq(10)
-          expect(data["summary"]["totalComments"]).to eq(2)
-          sort_field = sortBy == "receivedAt" ? "receivedAt" : "id"
-          sorted_values = data["comments"].map { |c| c[sort_field] }
-
-          expected_order = orderBy == "asc" ? sorted_values.sort : sorted_values.sort.reverse
-          expect(sorted_values).to eq(expected_order)
-        end
-
-      end
 
       response "200", "returns a planning application's public comments filtering by query" do
         example "application/json", :default, example_fixture("public/comments_public.json")
@@ -141,18 +138,16 @@ RSpec.describe "BOPS public API" do
           create(:neighbour_response, neighbour: create(:neighbour, consultation: planning_application.consultation))
         end
 
-        let(:query) { 'like' }
+        let(:query) { "like" }
 
         run_test! do |response|
           data = JSON.parse(response.body)
-          puts "DEBUG: Response data => #{data.inspect}"
           expect(data["pagination"]["totalItems"]).to eq(1)
           expect(data["pagination"]["currentPage"]).to eq(1)
           expect(data["pagination"]["resultsPerPage"]).to eq(10)
           expect(data["summary"]["totalComments"]).to eq(1)
           expect(data["comments"].first["comment"]).to include("I like it")
         end
-
       end
 
       it "validates successfully against the example comments_public json" do
@@ -162,7 +157,6 @@ RSpec.describe "BOPS public API" do
 
         expect(schemer.valid?(example_json)).to eq(true)
       end
-
     end
   end
 end
