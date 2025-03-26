@@ -29,7 +29,7 @@
           }
         }
       },
-      "required": ["totalComments", "sentiment"]
+      "required": ["totalComments", "totalConsulted", "sentiment"]
     },
     "comments": {
       "type": "array",
