@@ -73,7 +73,7 @@ RSpec.describe "BOPS public API" do
 
         let(:reference) { planning_application.reference }
         let(:sortBy) { "receivedAt" }
-        let(:order) { "desc" }
+        let(:orderBy) { "desc" }
         let(:page) { 1 }
 
         run_test! do |response|
@@ -102,11 +102,10 @@ RSpec.describe "BOPS public API" do
           expect(data["pagination"]["totalPages"]).to eq(1)
           expect(data["pagination"]["totalItems"]).to eq(2)
           expect(data["summary"]["totalComments"]).to eq(2)
-          sort_field = (sortBy == "receivedAt") ? "receivedAt" : "id"
-          sorted_values = data["comments"].pluck(sort_field)
-
-          expected_order = (orderBy == "desc") ? sorted_values.sort : sorted_values.sort.reverse
-          expect(sorted_values).to eq(expected_order)
+          sort_field = (sortBy == "receivedAt") ? "received_at" : "id"
+          sorted_comments = data["comments"].sort_by { |c| c[sort_field] }
+          sorted_comments.reverse! if orderBy == "desc"
+          expect(data["comments"]).to eq(sorted_comments)
         end
       end
 
@@ -127,8 +126,7 @@ RSpec.describe "BOPS public API" do
           expect(data["summary"]["totalComments"]).to eq(2)
           sort_field = (sortBy == "receivedAt") ? "receivedAt" : "id"
           sorted_values = data["comments"].pluck(sort_field)
-
-          expected_order = (orderBy == "desc") ? sorted_values.sort : sorted_values.sort.reverse
+          expected_order = (orderBy == "asc") ? sorted_values.sort : sorted_values.sort.reverse
           expect(sorted_values).to eq(expected_order)
         end
       end

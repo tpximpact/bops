@@ -94,11 +94,9 @@ RSpec.describe "BOPS public API" do
             expect(data["pagination"]["currentPage"]).to eq(1)
             expect(data["pagination"]["resultsPerPage"]).to eq(10)
             expect(data["summary"]["totalComments"]).to eq(2)
-            sort_field = (sortBy == "receivedAt") ? "receivedAt" : "id"
-            sorted_values = data["comments"].pluck(sort_field)
 
-            expected_order = (orderBy == "asc") ? sorted_values.sort : sorted_values.sort.reverse
-            expect(sorted_values).to eq(expected_order)
+            sorted_values = data["comments"].pluck(sortBy)
+            expect(sorted_values).to eq(sorted_values.sort.reverse)
           end
         end
 
@@ -121,11 +119,13 @@ RSpec.describe "BOPS public API" do
             expect(data["pagination"]["currentPage"]).to eq(1)
             expect(data["pagination"]["resultsPerPage"]).to eq(10)
             expect(data["summary"]["totalComments"]).to eq(2)
-            sort_field = (sortBy == "receivedAt") ? "receivedAt" : "id"
-            sorted_values = data["comments"].pluck(sort_field)
+            sort_field = (sortBy == "receivedAt") ? "received_at" : "id"
 
-            expected_order = (orderBy == "asc") ? sorted_values.sort : sorted_values.sort.reverse
-            expect(sorted_values).to eq(expected_order)
+            sorted_comments = data["comments"].sort_by { |c| c[sort_field] }
+
+            sorted_comments.reverse! if orderBy == "desc"
+
+            expect(data["comments"]).to eq(sorted_comments)
           end
         end
 
