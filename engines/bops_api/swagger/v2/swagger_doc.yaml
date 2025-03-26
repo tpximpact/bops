@@ -21565,7 +21565,7 @@ components:
                 enum:
                 - objection
                 - neutral
-                - supportive
+                - approved
                 type: string
               comment:
                 type: string
@@ -35183,6 +35183,8 @@ paths:
                       receivedAt: '2025-03-13T10:49:25Z'
               schema:
                 "$ref": "#/components/schemas/CommentsPublicResponse"
+        '404':
+          description: does not return comments for unpublished planning applications
   "/api/v2/public/planning_applications/{reference}/comments/specialist":
     get:
       summary: Retrieves comments for a planning application
@@ -35236,8 +35238,8 @@ paths:
         required: false
       responses:
         '200':
-          description: returns a planning application's specialist comments given
-            a reference sortBy id and orderBy asc
+          description: returns a planning application's specialist comments filtering
+            by query
           content:
             application/json:
               examples:
@@ -35274,6 +35276,8 @@ paths:
                       receivedAt: '2025-03-13T10:49:25Z'
               schema:
                 "$ref": "#/components/schemas/CommentsSpecialistResponse"
+        '404':
+          description: does not return comments for unpublished planning applications
   "/api/v2/public/planning_applications/{reference}/documents":
     get:
       summary: Retrieves documents for a planning application

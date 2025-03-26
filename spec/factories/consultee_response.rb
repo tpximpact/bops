@@ -6,5 +6,10 @@ FactoryBot.define do
     summary_tag { "approved" }
     response { Faker::Lorem.paragraph }
     received_at { Time.current }
+    redacted_response { "I like it *** " }
+  end
+
+  trait :with_redaction do
+    redacted_response { "I like it *** " }
   end
 end

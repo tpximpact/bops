@@ -151,11 +151,10 @@ RSpec.describe "BOPS public API" do
       end
 
       response "404", "does not return comments for unpublished planning applications" do
-
         let(:reference) { planning_application.reference }
 
         let(:planning_application) do
-          create(:planning_application, :in_assessment, local_authority:, application_type:) 
+          create(:planning_application, :in_assessment, local_authority:, application_type:)
         end
 
         before do
@@ -164,7 +163,7 @@ RSpec.describe "BOPS public API" do
 
         run_test! do |response|
           data = JSON.parse(response.body)
-          
+
           expect(data["error"]["message"]).to eq("Not Found")
         end
       end
