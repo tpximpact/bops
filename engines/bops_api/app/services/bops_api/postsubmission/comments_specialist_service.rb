@@ -12,6 +12,10 @@ module BopsApi
           "id" => {column: "consultee_responses.id", default_order: "asc"}
         }
       end
+
+      def response_table_name
+        "consultee_responses"
+      end
     end
   end
 end

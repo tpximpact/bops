@@ -3,6 +3,8 @@
 module BopsApi
   module Postsubmission
     class CommentsBaseService
+      include BopsApi::PostsubmissionApplicationSchemaHelper
+
       def initialize(scope, params)
         @scope = scope
         @params = params
@@ -26,8 +28,26 @@ module BopsApi
           scope = scope.where("redacted_response ILIKE ?", "%#{params[:query]}%")
         end
 
+        # Filter by sentiment
+        if params[:sentiment].present?
+          scope = scope.where(summary_tag: params[:sentiment])
+        end
+
+        # Filter by publishedAtFrom
+        if params[:publishedAtFrom].present?
+          datetime = format_postsubmission_date(params[:publishedAtFrom])
+          scope = scope.where("#{response_table_name}.updated_at >= ?", datetime)
+        end
+
+        # Filter by publishedAtTo
+        if params[:publishedAtTo].present?
+          datetime = format_postsubmission_date(params[:publishedAtTo])
+          scope = scope.where("#{response_table_name}.updated_at <= ?", datetime)
+        end
+
         scope
       end
+
 
       # Defines allowed fields and their default sort orders
       def allowed_sort_fields
