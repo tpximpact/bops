@@ -16,6 +16,10 @@ module BopsApi
       def response_table_name
         "neighbour_responses"
       end
+
+      def translated_sentiment(sentiment)
+        sentiment
+      end
     end
   end
 end

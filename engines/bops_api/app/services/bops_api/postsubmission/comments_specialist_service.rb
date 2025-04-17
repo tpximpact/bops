@@ -16,6 +16,14 @@ module BopsApi
       def response_table_name
         "consultee_responses"
       end
+
+      def translated_sentiment(sentiment)
+        {
+          "supportive" => "approved",
+          "objection" => "objected",
+          "neutral" => "amendments_needed"
+        }[sentiment] || sentiment
+      end
     end
   end
 end
