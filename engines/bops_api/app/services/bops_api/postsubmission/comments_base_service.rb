@@ -30,7 +30,7 @@ module BopsApi
 
         # Filter by sentiment
         if params[:sentiment].present?
-          scope = scope.where(summary_tag: params[:sentiment])
+          scope = scope.where(summary_tag: translated_sentiment(params[:sentiment]))
         end
 
         # Filter by publishedAtFrom

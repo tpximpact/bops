@@ -4,8 +4,8 @@
 
 json.id comment.id
 json.sentiment case comment.summary_tag
-when "supportive"
-  "approved"
+when "approved"
+  "supportive"
 when "objected"
   "objection"
 when "amendments_needed"

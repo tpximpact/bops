@@ -41,7 +41,7 @@
               "type": "integer"
             },
             "sentiment": {
-              "enum": ["objection", "neutral", "approved"],
+              "enum": ["objection", "neutral", "supportive"],
               "type": "string"
             },
             "comment": {
