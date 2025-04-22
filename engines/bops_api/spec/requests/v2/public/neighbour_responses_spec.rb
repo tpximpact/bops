@@ -170,7 +170,6 @@ RSpec.describe "BOPS public API Public comments" do
 
         run_test! do |response|
           data = JSON.parse(response.body)
-          Rails.logger.debug "Sentiment filter: #{data}"
           # pagination
           validate_pagination(data, results_per_page: BopsApi::Postsubmission::PostsubmissionPagination::DEFAULT_MAXRESULTS, current_page: BopsApi::Postsubmission::PostsubmissionPagination::DEFAULT_PAGE, total_items: 1)
 
@@ -261,7 +260,6 @@ RSpec.describe "BOPS public API Public comments" do
           end
         end
       end
-
 
       response "200", "returns a planning application's public comments filtering by sortBy and orderBy" do
         let(:reference) { planning_application.reference }
