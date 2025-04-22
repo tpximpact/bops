@@ -195,9 +195,9 @@ RSpec.describe "BOPS public API Specialist comments" do
       response "200", "returns specialist comments filtered by publishedAtFrom" do
         before do
           # Old response
-          old_response = create(:consultee, :external, :consulted, created_at: 1.month.ago,
+          create(:consultee, :external, :consulted, created_at: 1.month.ago,
             updated_at: 1.month.ago, responses: build_list(:consultee_response, 1, :with_redaction, response: "rude word not like the other comments", redacted_response: "***** not like the other comments"), consultation: planning_application.consultation)
-          recent_response = create(:consultee, :external, :consulted, created_at: 2.weeks.ago,
+          create(:consultee, :external, :consulted, created_at: 2.weeks.ago,
             updated_at: 1.weeks.ago, responses: build_list(:consultee_response, 1, :with_redaction, response: "rude word not like the other comments", redacted_response: "***** not like the other comments"), consultation: planning_application.consultation)
         end
 
@@ -216,9 +216,9 @@ RSpec.describe "BOPS public API Specialist comments" do
       response "200", "returns specialist comments filtered by publishedAtTo" do
         before do
           # Old response
-          old_response = create(:consultee, :external, :consulted, created_at: 1.month.ago,
+          create(:consultee, :external, :consulted, created_at: 1.month.ago,
             updated_at: 1.month.ago, responses: build_list(:consultee_response, 1, :with_redaction, response: "rude word not like the other comments", redacted_response: "***** not like the other comments"), consultation: planning_application.consultation)
-          recent_response = create(:consultee, :external, :consulted, created_at: 2.weeks.ago,
+          create(:consultee, :external, :consulted, created_at: 2.weeks.ago,
             updated_at: 1.weeks.ago, responses: build_list(:consultee_response, 1, :with_redaction, response: "rude word not like the other comments", redacted_response: "***** not like the other comments"), consultation: planning_application.consultation)
         end
 
@@ -233,7 +233,6 @@ RSpec.describe "BOPS public API Specialist comments" do
           )
         end
       end
-
 
       response "200", "returns a planning application's specialist comments filtering by sortBy and orderBy" do
         let(:reference) { planning_application.reference }

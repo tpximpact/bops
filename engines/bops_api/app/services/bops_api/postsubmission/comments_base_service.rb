@@ -48,7 +48,6 @@ module BopsApi
         scope
       end
 
-
       # Defines allowed fields and their default sort orders
       def allowed_sort_fields
         {
