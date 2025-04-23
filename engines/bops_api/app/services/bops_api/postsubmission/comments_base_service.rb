@@ -35,8 +35,15 @@ module BopsApi
 
         # Filter by publishedAtFrom
         if params[:publishedAtFrom].present?
-          datetime = format_postsubmission_date(params[:publishedAtFrom])
-          scope = scope.where("#{response_table_name}.updated_at >= ?", datetime)
+          datetime = parse_and_format_date(params[:publishedAtFrom])
+          # datetime = format_postsubmission_date(params[:publishedAtFrom])
+          if datetime
+            scope = scope.where("#{response_table_name}.updated_at >= ?", datetime)
+          else
+    # Handle the case where the date is invalid
+    # You might want to log this or raise an error
+          end
+          # scope = scope.where("#{response_table_name}.updated_at >= ?", datetime)
         end
 
         # Filter by publishedAtTo
@@ -46,6 +53,15 @@ module BopsApi
         end
 
         scope
+      end
+
+      def parse_and_format_date(date_string)
+        begin
+          # Assuming the date is in 'dd/mm/yyyy' format
+          Date.strptime(date_string, '%d/%m/%Y').beginning_of_day
+        rescue ArgumentError
+          nil # Return nil if the date is invalid
+        end
       end
 
       # Defines allowed fields and their default sort orders
