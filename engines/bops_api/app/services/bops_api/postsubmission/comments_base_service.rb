@@ -25,22 +25,42 @@ module BopsApi
       # Defines what can be filtered
       def filter_by(scope)
         if params[:query].present?
+          query = params[:query]
+          unless allowed_order_values.include?(query)
+            raise ArgumentError, "Invalid orderBy value: #{params[:query]}. Allowed values are: #{allowed_order_values.join(", ")}"
+          end
+        else
           scope = scope.where("redacted_response ILIKE ?", "%#{params[:query]}%")
         end
 
         # Filter by sentiment
         if params[:sentiment].present?
+          sentiment = params[:sentiment]
+          unless allowed_order_values.include?(sentiment)
+            raise ArgumentError, "Invalid orderBy value: #{params[:sentiment]}. Allowed values are: #{allowed_order_values.join(", ")}"
+          end
+        else
           scope = scope.where(summary_tag: translated_sentiment(params[:sentiment]))
         end
 
         # Filter by publishedAtFrom
         if params[:publishedAtFrom].present?
+          publishedAtFrom = params[:publishedAtFrom]
+          unless allowed_order_values.include?(publishedAtFrom)
+            raise ArgumentError, "Invalid orderBy value: #{params[:publishedAtFrom]}. Allowed values are: #{allowed_order_values.join(", ")}"
+          end
+        else
           datetime = format_postsubmission_date(params[:publishedAtFrom])
           scope = scope.where("#{response_table_name}.updated_at >= ?", datetime)
         end
 
         # Filter by publishedAtTo
         if params[:publishedAtTo].present?
+          publishedAtTo = params[:publishedAtTo]
+          unless allowed_order_values.include?(publishedAtTo)
+            raise ArgumentError, "Invalid orderBy value: #{params[:publishedAtTo]}. Allowed values are: #{allowed_order_values.join(", ")}"
+          end
+        else
           datetime = format_postsubmission_date(params[:publishedAtTo])
           scope = scope.where("#{response_table_name}.updated_at <= ?", datetime)
         end
