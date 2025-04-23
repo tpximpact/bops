@@ -39,14 +39,14 @@ module BopsApi
         if params[:publishedAtFrom].present?
           publishedAtFrom = params[:publishedAtFrom]
           datetime = format_postsubmission_date(publishedAtFrom)
-          scope = scope.where("#{response_table_name}.updated_at >= ?", sanitize_sql_like(datetime))
+          scope = scope.where("#{response_table_name}.created_at >= ?", sanitize_sql_like(datetime))
         end
 
         # Filter by publishedAtTo
         if params[:publishedAtTo].present?
           publishedAtTo = params[:publishedAtTo]
           datetime = format_postsubmission_date(publishedAtTo)
-          scope = scope.where("#{response_table_name}.updated_at <= ?", sanitize_sql_like(datetime))
+          scope = scope.where("#{response_table_name}.created_at <= ?", sanitize_sql_like(datetime))
         end
 
         scope
