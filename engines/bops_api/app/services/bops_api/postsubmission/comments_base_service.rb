@@ -38,15 +38,15 @@ module BopsApi
         # Filter by publishedAtFrom
         if params[:publishedAtFrom].present?
           publishedAtFrom = params[:publishedAtFrom]
-          datetime = format_postsubmission_date(publishedAtFrom)
-          scope = scope.where("#{response_table_name}.updated_at >= ?", datetime)
+          datetime_from = format_postsubmission_date(params[:publishedAtFrom])
+          scope = scope.where("#{response_table_name}.updated_at >= ?", datetime_from)
         end
 
         # Filter by publishedAtTo
         if params[:publishedAtTo].present?
           publishedAtTo = params[:publishedAtTo]
-          datetime = format_postsubmission_date(publishedAtTo)
-          scope = scope.where("#{response_table_name}.updated_at <= ?", datetime)
+          datetime_to = format_postsubmission_date(params[:publishedAtTo])
+          scope = scope.where("#{response_table_name}.updated_at <= ?", datetime_to)
         end
 
         scope
@@ -55,6 +55,17 @@ module BopsApi
       # Use ActiveRecord's sanitize_sql_like to escape special characters in the query
       def sanitize_sql_like(string)
         ActiveRecord::Base.sanitize_sql_like(string)
+      end
+
+      # Parse and validate date strings
+      def parse_date(date_string)
+        return nil if date_string.blank?
+
+        begin
+          Date.parse(date_string)
+        rescue ArgumentError
+          nil # Return nil if the date is invalid
+        end
       end
 
       # Defines allowed fields and their default sort orders
