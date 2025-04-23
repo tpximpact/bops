@@ -25,7 +25,7 @@ module BopsApi
       # Defines what can be filtered
       def filter_by(scope)
         if params[:query].present?
-          scope = scope.where("redacted_response ILIKE ?", "%#{params[:query]}%")
+          scope = scope.where("redacted_response ILIKE ?", "%#{sanitize_sql_like(params[:query])}%")
         end
 
         # Filter by sentiment
@@ -46,6 +46,11 @@ module BopsApi
         end
 
         scope
+      end
+
+      # Use ActiveRecord's sanitize_sql_like to escape special characters in the query
+      def sanitize_sql_like(string)
+        ActiveRecord::Base.sanitize_sql_like(string)
       end
 
       # Defines allowed fields and their default sort orders
