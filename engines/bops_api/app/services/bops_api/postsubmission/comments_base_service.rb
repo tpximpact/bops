@@ -25,12 +25,14 @@ module BopsApi
       # Defines what can be filtered
       def filter_by(scope)
         if params[:query].present?
-          scope = scope.where("redacted_response ILIKE ?", "%#{sanitize_sql_like(params[:query])}%")
+          query = params[:query]
+          scope = scope.where("redacted_response ILIKE ?", "%#{sanitize_sql_like(query)}%")
         end
 
         # Filter by sentiment
         if params[:sentiment].present?
-          scope = scope.where(summary_tag: translated_sentiment(params[:sentiment]))
+          sentiment = params[:sentiment]
+          scope = scope.where(summary_tag: translated_sentiment(sentiment))
         end
 
         # Filter by publishedAtFrom
