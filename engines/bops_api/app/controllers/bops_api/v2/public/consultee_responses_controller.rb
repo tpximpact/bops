@@ -6,6 +6,8 @@ module BopsApi
       class ConsulteeResponsesController < PublicController
         def index
           @planning_application = find_planning_application params[:planning_application_id]
+          return render json: { error: 'Planning application not found' }, status: :not_found unless @planning_application
+
           @consultation = @planning_application.consultation
           if @consultation.nil?
             raise BopsApi::Errors::InvalidRequestError, "Consultation not found"
@@ -15,9 +17,11 @@ module BopsApi
           @total_responses = @consultee_responses.count
           @total_consulted = @consultation.consultees.count
 
-          @response_summary = @consultee_responses.group(:summary_tag)
-            .unscope(:order) # Remove default ORDER BY clause
-            .count
+          @response_summary = calculate_response_summary(@consultee_responses)
+
+          # @response_summary = @consultee_responses.group(:summary_tag)
+          #   .unscope(:order) # Remove default ORDER BY clause
+          #   .count
           @response_summary = {
             supportive: @response_summary["approved"] || 0,
             objection: @response_summary["objected"] || 0,
@@ -35,6 +39,15 @@ module BopsApi
         end
 
         private
+
+        def calculate_response_summary(consultee_responses)
+          summary = consultee_responses.group(:summary_tag).unscope(:order).count
+          {
+            supportive: summary['approved'] || 0,
+            objection: summary['objected'] || 0,
+            neutral: summary['amendments_needed'] || 0
+          }
+        end
 
         # Permit and return the required parameters
         def pagination_params
