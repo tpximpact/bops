@@ -24,6 +24,7 @@ module BopsApi
 
       # Defines what can be filtered
       def filter_by(scope)
+        table = Arel::Table.new(response_table_name.to_sym)
         if params[:query].present?
           scope = scope.where("redacted_response ILIKE ?", "%#{params[:query]}%")
         end
@@ -35,33 +36,17 @@ module BopsApi
 
         # Filter by publishedAtFrom
         if params[:publishedAtFrom].present?
-          datetime = parse_and_format_date(params[:publishedAtFrom])
-          # datetime = format_postsubmission_date(params[:publishedAtFrom])
-          if datetime
-            scope = scope.where("#{response_table_name}.updated_at >= ?", datetime)
-          else
-    # Handle the case where the date is invalid
-    # You might want to log this or raise an error
-          end
-          # scope = scope.where("#{response_table_name}.updated_at >= ?", datetime)
+          datetime = format_postsubmission_date(params[:publishedAtFrom])
+          scope = scope.where(table[:updated_at].gteq(datetime))
         end
 
         # Filter by publishedAtTo
         if params[:publishedAtTo].present?
           datetime = format_postsubmission_date(params[:publishedAtTo])
-          scope = scope.where("#{response_table_name}.updated_at <= ?", datetime)
+          scope = scope.where(table[:updated_at].lteq(datetime))
         end
 
         scope
-      end
-
-      def parse_and_format_date(date_string)
-        begin
-          # Assuming the date is in 'dd/mm/yyyy' format
-          Date.strptime(date_string, '%d/%m/%Y').beginning_of_day
-        rescue ArgumentError
-          nil # Return nil if the date is invalid
-        end
       end
 
       # Defines allowed fields and their default sort orders
