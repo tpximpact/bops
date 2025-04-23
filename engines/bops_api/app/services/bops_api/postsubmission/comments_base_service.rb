@@ -25,47 +25,27 @@ module BopsApi
       # Defines what can be filtered
       def filter_by(scope)
         if params[:query].present?
-          query = params[:query]
-          scope = scope.where("redacted_response ILIKE ?", "%#{sanitize_sql_like(query)}%")
+          scope = scope.where("redacted_response ILIKE ?", "%#{params[:query]}%")
         end
 
         # Filter by sentiment
         if params[:sentiment].present?
-          sentiment = params[:sentiment]
-          scope = scope.where(summary_tag: translated_sentiment(sentiment))
+          scope = scope.where(summary_tag: translated_sentiment(params[:sentiment]))
         end
 
-        # # Filter by publishedAtFrom
+        # Filter by publishedAtFrom
         if params[:publishedAtFrom].present?
-          publishedAtFrom = params[:publishedAtFrom]
-          datetime_from = format_postsubmission_date(params[:publishedAtFrom])
-          # scope = scope.where("#{response_table_name}.updated_at >= ?", datetime_from)
+          datetime = format_postsubmission_date(params[:publishedAtFrom])
+          scope = scope.where("#{response_table_name}.updated_at >= ?", datetime)
         end
 
-        # # Filter by publishedAtTo
+        # Filter by publishedAtTo
         if params[:publishedAtTo].present?
-          publishedAtTo = params[:publishedAtTo]
-          datetime_to = format_postsubmission_date(params[:publishedAtTo])
-          # scope = scope.where("#{response_table_name}.updated_at <= ?", datetime_to)
+          datetime = format_postsubmission_date(params[:publishedAtTo])
+          scope = scope.where("#{response_table_name}.updated_at <= ?", datetime)
         end
 
         scope
-      end
-
-      # Use ActiveRecord's sanitize_sql_like to escape special characters in the query
-      def sanitize_sql_like(string)
-        ActiveRecord::Base.sanitize_sql_like(string)
-      end
-
-      # Parse and validate date strings
-      def parse_date(date_string)
-        return nil if date_string.blank?
-
-        begin
-          Date.parse(date_string)
-        rescue ArgumentError
-          nil # Return nil if the date is invalid
-        end
       end
 
       # Defines allowed fields and their default sort orders

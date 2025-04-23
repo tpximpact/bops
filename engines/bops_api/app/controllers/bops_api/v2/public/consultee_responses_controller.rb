@@ -6,7 +6,7 @@ module BopsApi
       class ConsulteeResponsesController < PublicController
         def index
           @planning_application = find_planning_application params[:planning_application_id]
-          return render json: { error: 'Planning application not found' }, status: :not_found unless @planning_application
+          return render json: {error: "Planning application not found"}, status: :not_found unless @planning_application
 
           @consultation = @planning_application.consultation
           if @consultation.nil?
@@ -43,9 +43,9 @@ module BopsApi
         def calculate_response_summary(consultee_responses)
           summary = consultee_responses.group(:summary_tag).unscope(:order).count
           {
-            supportive: summary['approved'] || 0,
-            objection: summary['objected'] || 0,
-            neutral: summary['amendments_needed'] || 0
+            supportive: summary["approved"] || 0,
+            objection: summary["objected"] || 0,
+            neutral: summary["amendments_needed"] || 0
           }
         end
 
