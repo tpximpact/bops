@@ -35,19 +35,19 @@ module BopsApi
           scope = scope.where(summary_tag: translated_sentiment(sentiment))
         end
 
-        # Filter by publishedAtFrom
-        if params[:publishedAtFrom].present?
-          publishedAtFrom = params[:publishedAtFrom]
-          datetime_from = format_postsubmission_date(params[:publishedAtFrom])
-          scope = scope.where("#{response_table_name}.updated_at >= ?", datetime_from)
-        end
+        # # Filter by publishedAtFrom
+        # if params[:publishedAtFrom].present?
+        #   publishedAtFrom = params[:publishedAtFrom]
+        #   datetime_from = format_postsubmission_date(params[:publishedAtFrom])
+        #   scope = scope.where("#{response_table_name}.updated_at >= ?", datetime_from)
+        # end
 
-        # Filter by publishedAtTo
-        if params[:publishedAtTo].present?
-          publishedAtTo = params[:publishedAtTo]
-          datetime_to = format_postsubmission_date(params[:publishedAtTo])
-          scope = scope.where("#{response_table_name}.updated_at <= ?", datetime_to)
-        end
+        # # Filter by publishedAtTo
+        # if params[:publishedAtTo].present?
+        #   publishedAtTo = params[:publishedAtTo]
+        #   datetime_to = format_postsubmission_date(params[:publishedAtTo])
+        #   scope = scope.where("#{response_table_name}.updated_at <= ?", datetime_to)
+        # end
 
         scope
       end
