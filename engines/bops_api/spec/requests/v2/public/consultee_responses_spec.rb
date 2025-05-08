@@ -166,7 +166,7 @@ RSpec.describe "BOPS public API Specialist comments" do
         end
 
         let(:reference) { planning_application.reference }
-        let(:sentiment) { "supportive" }
+        let(:sentiment) { "approved" }
 
         run_test! do |response|
           data = JSON.parse(response.body)
@@ -179,7 +179,7 @@ RSpec.describe "BOPS public API Specialist comments" do
 
           # comments
           validate_comments(data, count: 10, total_items: 1)
-          expect(data["comments"].first["sentiment"]).to eq("supportive")
+          expect(data["comments"].first["sentiment"]).to eq("approved")
         end
       end
 
