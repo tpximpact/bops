@@ -26,6 +26,11 @@ module BopsApi
           scope = scope.where("redacted_response ILIKE ?", "%#{params[:query]}%")
         end
 
+        # Filter by sentiment
+        if params[:sentiment].present?
+          scope = scope.where(summary_tag: params[:sentiment])
+        end
+
         scope
       end
 

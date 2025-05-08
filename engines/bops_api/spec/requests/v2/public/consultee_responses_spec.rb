@@ -64,6 +64,11 @@ RSpec.describe "BOPS public API Specialist comments" do
         description: "Search by redacted comment content"
       }, required: false
 
+      parameter name: :sentiment, in: :query, schema: {
+        type: :string,
+        description: "Search by sentiment"
+      }, required: false
+
       def validate_pagination(data, results_per_page:, current_page:, total_items:)
         expect(data["pagination"]["resultsPerPage"]).to eq(results_per_page)
         expect(data["pagination"]["currentPage"]).to eq(current_page)
@@ -74,16 +79,16 @@ RSpec.describe "BOPS public API Specialist comments" do
       def validate_comment_summary(data)
         expect(data["summary"]["totalComments"]).to eq(50)
         expect(data["summary"]["totalConsulted"]).to eq(100)
-        expect(data["summary"]["sentiment"]["supportive"]).to eq(50)
-        expect(data["summary"]["sentiment"]["objection"]).to eq(0)
-        expect(data["summary"]["sentiment"]["neutral"]).to eq(0)
+        expect(data["summary"]["sentiment"]["approved"]).to eq(50)
+        expect(data["summary"]["sentiment"]["amendmentsNeeded"]).to eq(0)
+        expect(data["summary"]["sentiment"]["objected"]).to eq(0)
       end
 
       def validate_comments(data, count:, total_items:)
         expect(data["comments"].count).to eq(count)
         data["comments"].each do |comment|
           expect(comment["id"]).to be_a(Integer)
-          expect(comment["sentiment"]).to be_in(["supportive", "objection", "neutral"])
+          expect(comment["sentiment"]).to be_in(["approved", "amendmentsNeeded", "objected"])
           expect(comment["comment"]).to include("*****")
           expect { DateTime.iso8601(comment["receivedAt"]) }.not_to raise_error
         end
@@ -144,13 +149,36 @@ RSpec.describe "BOPS public API Specialist comments" do
 
           # comment summary
           expect(data["summary"]["totalComments"]).to eq(51)
-          expect(data["summary"]["sentiment"]["supportive"]).to eq(51)
-          expect(data["summary"]["sentiment"]["objection"]).to eq(0)
-          expect(data["summary"]["sentiment"]["neutral"]).to eq(0)
+          expect(data["summary"]["sentiment"]["approved"]).to eq(51)
+          expect(data["summary"]["sentiment"]["amendmentsNeeded"]).to eq(0)
+          expect(data["summary"]["sentiment"]["objected"]).to eq(0)
 
           # comments
           validate_comments(data, count: 1, total_items: 1)
           expect(data["comments"].first["comment"]).to include("***** not like the other comments")
+        end
+      end
+
+      response "200", "returns a planning application's specialist comments filtering by sentiment" do
+        before do
+          create(:consultee, :external, :consulted, responses: build_list(:consultee_response, 1, :with_redaction, response: "rude word not like the other comments", redacted_response: "***** not like the other comments"), consultation: planning_application.consultation)
+        end
+
+        let(:reference) { planning_application.reference }
+        let(:sentiment) { "supportive" }
+
+        run_test! do |response|
+          data = JSON.parse(response.body)
+
+          # pagination
+          expect(data["pagination"]["totalPages"]).to eq(6)
+
+          # comment summary
+          expect(data["summary"]["totalComments"]).to eq(51)
+
+          # comments
+          validate_comments(data, count: 10, total_items: 1)
+          expect(data["comments"].first["sentiment"]).to eq("supportive")
         end
       end
 
@@ -197,6 +225,7 @@ RSpec.describe "BOPS public API Specialist comments" do
               expect(sorted_values).to eq(sorted_values.sort.reverse) # Descending order
             end
           end
+          
 
           context "sortBy is id orderBy defaults to asc" do
             let(:sortBy) { "id" }
