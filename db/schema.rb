@@ -945,9 +945,9 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_27_103524) do
     t.virtual "address_search", type: :tsvector, as: "to_tsvector('simple'::regconfig, (((((((((COALESCE(address_1, ''::character varying))::text || ' '::text) || (COALESCE(address_2, ''::character varying))::text) || ' '::text) || (COALESCE(town, ''::character varying))::text) || ' '::text) || (COALESCE(county, ''::character varying))::text) || ' '::text) || (COALESCE(postcode, ''::character varying))::text))", stored: true
     t.datetime "deleted_at"
     t.string "previous_references", default: [], array: true
+    t.string "reporting_type_code"
     t.bigint "recommended_application_type_id"
     t.bigint "reporting_type_id"
-    t.string "reporting_type_code"
     t.bigint "submission_id"
     t.string "map_east"
     t.string "map_north"

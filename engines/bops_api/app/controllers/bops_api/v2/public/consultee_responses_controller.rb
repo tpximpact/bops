@@ -38,7 +38,7 @@ module BopsApi
 
         # Permit and return the required parameters
         def pagination_params
-          params.permit(:sortBy, :orderBy, :resultsPerPage, :query, :page, :format, :planning_application_id)
+          params.permit(:sortBy, :orderBy, :sentiment, :resultsPerPage, :query, :page, :format, :planning_application_id)
         end
       end
     end
