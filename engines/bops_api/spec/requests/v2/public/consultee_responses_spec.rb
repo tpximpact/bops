@@ -226,7 +226,6 @@ RSpec.describe "BOPS public API Specialist comments" do
               expect(sorted_values).to eq(sorted_values.sort.reverse) # Descending order
             end
           end
-          
 
           context "sortBy is id orderBy defaults to asc" do
             let(:sortBy) { "id" }
