@@ -83,10 +83,10 @@ RSpec.describe "BOPS public API Specialist comments" do
         def validate_comments(data, count:, total_items:)
           expect(data["comments"].count).to eq(count)
           data["comments"].each do |comment|
-          expect(comment["id"]).to be_a(Integer)
-          expect(comment["sentiment"]).to be_in(["approved", "objection", "neutral"])
-          expect(comment["comment"]).to include("*****")
-          expect { DateTime.iso8601(comment["receivedAt"]) }.not_to raise_error
+            expect(comment["id"]).to be_a(Integer)
+            expect(comment["sentiment"]).to be_in(["approved", "objection", "neutral"])
+            expect(comment["comment"]).to include("*****")
+            expect { DateTime.iso8601(comment["receivedAt"]) }.not_to raise_error
           end
         end
 
@@ -99,14 +99,14 @@ RSpec.describe "BOPS public API Specialist comments" do
           run_test! do |response|
             data = JSON.parse(response.body)
 
-          # pagination
-          validate_pagination(data, results_per_page: BopsApi::Postsubmission::PostsubmissionPagination::DEFAULT_MAXRESULTS, current_page: BopsApi::Postsubmission::PostsubmissionPagination::DEFAULT_PAGE, total_items: 50)
+            # pagination
+            validate_pagination(data, results_per_page: BopsApi::Postsubmission::PostsubmissionPagination::DEFAULT_MAXRESULTS, current_page: BopsApi::Postsubmission::PostsubmissionPagination::DEFAULT_PAGE, total_items: 50)
 
-          # comment summary
-          validate_comment_summary(data)
+            # comment summary
+            validate_comment_summary(data)
 
-          # comments
-          validate_comments(data, count: 10, total_items: 50)
+            # comments
+            validate_comments(data, count: 10, total_items: 50)
           end
         end
 
