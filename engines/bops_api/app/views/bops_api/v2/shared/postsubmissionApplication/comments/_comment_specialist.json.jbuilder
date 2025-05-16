@@ -2,11 +2,10 @@
 
 # DprComment
 
-json.id        comment.id
+json.id comment.id
 json.sentiment comment.summary_tag.camelize(:lower)
-json.comment   comment.redacted_response
+json.comment comment.redacted_response
 json.receivedAt format_postsubmission_datetime(comment.received_at)
-
 
 # SpecialistComment
 

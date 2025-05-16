@@ -92,7 +92,6 @@ RSpec.describe "BOPS public API Specialist comments" do
           end
         end
 
-
         response "200", "returns a planning application's specialist comments given a reference" do
           example "application/json", :default, example_fixture("public/comments_specialist.json")
           schema "$ref" => "#/components/schemas/CommentsSpecialistResponse"
