@@ -75,20 +75,23 @@ RSpec.describe "BOPS public API Specialist comments" do
         def validate_comment_summary(data)
           expect(data["summary"]["totalComments"]).to eq(50)
           expect(data["summary"]["totalConsulted"]).to eq(50)
-          expect(data["summary"]["sentiment"]["approved"]).to eq(50)
-          expect(data["summary"]["sentiment"]["objection"]).to eq(0)
-          expect(data["summary"]["sentiment"]["neutral"]).to eq(0)
+
+          sentiment = data.dig("summary", "sentiment")
+          expect(sentiment["approved"]).to eq(50)
+          expect(sentiment["objected"]).to eq(0)
+          expect(sentiment["amendmentsNeeded"]).to eq(0)
         end
 
         def validate_comments(data, count:, total_items:)
-          expect(data["comments"].count).to eq(count)
-          data["comments"].each do |comment|
-            expect(comment["id"]).to be_a(Integer)
-            expect(comment["sentiment"]).to be_in(["approved", "objection", "neutral"])
-            expect(comment["comment"]).to include("*****")
-            expect { DateTime.iso8601(comment["receivedAt"]) }.not_to raise_error
+          expect(data["comments"].size).to eq(count)
+          data["comments"].each do |c|
+            expect(c["id"]).to be_a(Integer)
+            expect(c["sentiment"]).to be_in(%w[approved objected amendmentsNeeded])
+            expect(c["comment"]).to include("*****")
+            expect { DateTime.iso8601(c["receivedAt"]) }.not_to raise_error
           end
         end
+
 
         response "200", "returns a planning application's specialist comments given a reference" do
           example "application/json", :default, example_fixture("public/comments_specialist.json")
@@ -145,8 +148,8 @@ RSpec.describe "BOPS public API Specialist comments" do
             # comment summary
             expect(data["summary"]["totalComments"]).to eq(51)
             expect(data["summary"]["sentiment"]["approved"]).to eq(51)
-            expect(data["summary"]["sentiment"]["objection"]).to eq(0)
-            expect(data["summary"]["sentiment"]["neutral"]).to eq(0)
+            expect(data["summary"]["sentiment"]["objected"]).to eq(0)
+            expect(data["summary"]["sentiment"]["amendmentsNeeded"]).to eq(0)
 
             # comments
             validate_comments(data, count: 1, total_items: 1)
@@ -328,9 +331,9 @@ RSpec.describe "BOPS public API Specialist comments" do
             data = JSON.parse(response.body)
 
             expect(data["summary"]["totalConsulted"]).to eq(1)
-            expect(data["summary"]["totalComments"]).to eq(2)
+            expect(data["summary"]["totalComments"]).to eq(1)
             expect(data["summary"]["sentiment"]["approved"]).to eq(1)
-            expect(data["summary"]["sentiment"]["objection"]).to eq(0)
+            expect(data["summary"]["sentiment"]["objected"]).to eq(0)
             expect(data["comments"].count).to eq(2)
             expect(data["comments"].first["sentiment"]).to eq("approved")
           end

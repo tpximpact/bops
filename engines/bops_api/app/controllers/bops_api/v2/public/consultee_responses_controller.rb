@@ -17,6 +17,7 @@ module BopsApi
 
           # gets last redacted response
           @response_summary = @consultation.consultees.map { |c| c.responses.redacted.max_by(&:id) }.compact.group_by(&:summary_tag).transform_values(&:count)
+          @total_comments   = @response_summary.values.sum
           @response_summary = {
             supportive: @response_summary["approved"] || 0,
             objection: @response_summary["objected"] || 0,
