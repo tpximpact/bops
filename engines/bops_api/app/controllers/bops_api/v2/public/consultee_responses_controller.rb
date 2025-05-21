@@ -19,9 +19,9 @@ module BopsApi
           @response_summary = @consultation.consultees.map { |c| c.responses.redacted.max_by(&:id) }.compact.group_by(&:summary_tag).transform_values(&:count)
           @total_comments = @response_summary.values.sum
           @response_summary = {
-            supportive: @response_summary["approved"] || 0,
-            objection: @response_summary["objected"] || 0,
-            neutral: @response_summary["amendments_needed"] || 0
+            approved: @response_summary["approved"] || 0,
+            objected: @response_summary["objected"] || 0,
+            amendments_needed: @response_summary["amendments_needed"] || 0
           }
 
           @pagy, @comments = BopsApi::Postsubmission::CommentsSpecialistService.new(

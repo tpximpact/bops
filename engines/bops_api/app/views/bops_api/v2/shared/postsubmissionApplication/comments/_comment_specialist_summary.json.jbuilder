@@ -2,9 +2,10 @@
 
 json.totalConsulted total_consulted
 json.totalComments total_comments
-
-json.sentiment do
-  json.approved response_summary[:supportive]
-  json.amendmentsNeeded response_summary[:neutral]
-  json.objected response_summary[:objection]
+if response_summary.present?
+  json.sentiment do
+    json.approved response_summary[:approved]
+    json.amendmentsNeeded response_summary[:amendments_needed]
+    json.objected response_summary[:objected]
+  end
 end
