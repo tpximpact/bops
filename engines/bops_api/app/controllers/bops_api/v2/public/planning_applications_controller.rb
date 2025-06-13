@@ -24,7 +24,7 @@ module BopsApi
 
         def search_service(scope)
           BopsApi::Postsubmission::PlanningApplicationsSearchService
-            .new(scope, params.permit(:q, :currentPage, :resultsPerPage))
+            .new(scope, params.permit(:q, :page, :resultsPerPage))
         end
       end
     end

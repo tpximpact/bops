@@ -6,10 +6,10 @@
     "totalResults": 10
   },
   "links": {
-    "first": "/api/v2/public/planning_applications/search?page=1&maxresults=2",
-    "last": "/api/v2/public/planning_applications/search?page=5&maxresults=2",
-    "prev": "/api/v2/public/planning_applications/search?page=1&maxresults=2",
-    "next": "/api/v2/public/planning_applications/search?page=3&maxresults=2"
+    "first": "/api/v2/public/planning_applications/search?page=1&resultsPerPage=2",
+    "last": "/api/v2/public/planning_applications/search?page=5&resultsPerPage=2",
+    "prev": "/api/v2/public/planning_applications/search?page=1&resultsPerPage=2",
+    "next": "/api/v2/public/planning_applications/search?page=3&resultsPerPage=2"
   },
   "data": [
     {

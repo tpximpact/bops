@@ -205,7 +205,7 @@ RSpec.describe "BOPS public API" do
 
           expect(metadata).to eq(
             "resultsPerPage" => 2,
-            "currentPage"    => 1,
+            "currentPage"    => page,
             "totalPages"     => 5,
             "totalResults"   => 10
           )
