@@ -1,14 +1,13 @@
-# spec/services/bops_api/postsubmission/planning_applications_search_service_spec.rb
 # frozen_string_literal: true
 
 require "rails_helper"
 
 RSpec.describe BopsApi::Postsubmission::PlanningApplicationsSearchService do
-  let(:scope)   { PlanningApplication.all }
-  let(:params)  { {} }
+  let(:scope) { PlanningApplication.all }
+  let(:params) { {} }
   let(:service) { described_class.new(scope, params) }
   let(:pagy_and_results) { service.call }
-  let(:pagy)    { pagy_and_results.first }
+  let(:pagy) { pagy_and_results.first }
   let(:results) { pagy_and_results.last }
 
   describe "#call" do
@@ -17,7 +16,7 @@ RSpec.describe BopsApi::Postsubmission::PlanningApplicationsSearchService do
         create_list(:planning_application, 25)
       end
 
-      let(:params) { { page: 2, resultsPerPage: 5 } }
+      let(:params) { {page: 2, resultsPerPage: 5} }
 
       it "paginates the results correctly" do
         expect(pagy).to have_attributes(
@@ -31,7 +30,7 @@ RSpec.describe BopsApi::Postsubmission::PlanningApplicationsSearchService do
       end
 
       context "when exceeding the resultsPerPage limit" do
-        let(:params) { { resultsPerPage: 50 } }
+        let(:params) { {resultsPerPage: 50} }
 
         it "limits the results to MAXRESULTS_LIMIT" do
           expect(pagy.limit).to eq(
@@ -42,7 +41,7 @@ RSpec.describe BopsApi::Postsubmission::PlanningApplicationsSearchService do
     end
 
     context "when performing a search" do
-      let!(:matching_reference)   { create(:planning_application) }
+      let!(:matching_reference) { create(:planning_application) }
       let!(:matching_description) do
         create(
           :planning_application,
@@ -53,14 +52,14 @@ RSpec.describe BopsApi::Postsubmission::PlanningApplicationsSearchService do
         create(
           :planning_application,
           address_1: "123 Unique Road",
-          county:    "Greater London",
-          town:      "Unique Town",
-          postcode:  "SE21 7DN"
+          county: "Greater London",
+          town: "Unique Town",
+          postcode: "SE21 7DN"
         )
       end
 
       context "when searching by reference" do
-        let(:params) { { q: matching_reference.reference } }
+        let(:params) { {q: matching_reference.reference} }
 
         it "returns applications matching the reference" do
           expect(results).to include(matching_reference)
@@ -72,7 +71,7 @@ RSpec.describe BopsApi::Postsubmission::PlanningApplicationsSearchService do
       end
 
       context "when searching by description" do
-        let(:params) { { q: "unique description" } }
+        let(:params) { {q: "unique description"} }
 
         it "returns applications matching the description" do
           expect(results).to include(matching_description)
@@ -85,7 +84,7 @@ RSpec.describe BopsApi::Postsubmission::PlanningApplicationsSearchService do
 
       context "when searching by address" do
         context "with address lines" do
-          let(:params) { { q: "123 unique Road Unique town" } }
+          let(:params) { {q: "123 unique Road Unique town"} }
 
           it "returns applications matching the address" do
             expect(results).to include(matching_address)
@@ -98,7 +97,7 @@ RSpec.describe BopsApi::Postsubmission::PlanningApplicationsSearchService do
 
         context "with postcode" do
           context "with exact postcode query" do
-            let(:params) { { q: "SE21 7DN" } }
+            let(:params) { {q: "SE21 7DN"} }
 
             it "returns applications matching the postcode" do
               expect(results).to include(matching_address)
@@ -110,7 +109,7 @@ RSpec.describe BopsApi::Postsubmission::PlanningApplicationsSearchService do
           end
 
           context "with postcode query" do
-            let(:params) { { q: "se217Dn" } }
+            let(:params) { {q: "se217Dn"} }
 
             it "returns applications matching the postcode" do
               expect(results).to include(matching_address)
@@ -124,7 +123,7 @@ RSpec.describe BopsApi::Postsubmission::PlanningApplicationsSearchService do
       end
 
       context "when no search term matches" do
-        let(:params) { { q: "noresults" } }
+        let(:params) { {q: "noresults"} }
 
         it "returns no results" do
           expect(results).to be_empty

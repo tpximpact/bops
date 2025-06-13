@@ -3,7 +3,7 @@
 require_relative "../../../swagger_helper"
 
 RSpec.describe "BOPS public API" do
-  let(:local_authority)  { create(:local_authority, :default) }
+  let(:local_authority) { create(:local_authority, :default) }
   let(:application_type) { create(:application_type, :householder) }
   let!(:planning_applications) do
     create_list(
@@ -11,14 +11,14 @@ RSpec.describe "BOPS public API" do
       :published,
       :with_boundary_geojson,
       :with_press_notice,
-      local_authority:  local_authority,
+      local_authority: local_authority,
       application_type: application_type,
-      user:             create(:user)
+      user: create(:user)
     )
   end
 
   # defaults for pagination
-  let(:page)           { 1 }
+  let(:page) { 1 }
   let(:resultsPerPage) { 5 }
 
   let(:invalidated) do
@@ -26,10 +26,10 @@ RSpec.describe "BOPS public API" do
       :planning_application,
       :with_boundary_geojson_features,
       :published,
-      local_authority:  local_authority,
+      local_authority: local_authority,
       application_type: application_type,
-      description:      "This is not valid even if marked as published",
-      status:           :invalidated
+      description: "This is not valid even if marked as published",
+      status: :invalidated
     )
   end
 
@@ -39,7 +39,7 @@ RSpec.describe "BOPS public API" do
       :planning_application, 2,
       :with_boundary_geojson_features,
       :published,
-      local_authority:  local_authority,
+      local_authority: local_authority,
       application_type: application_type
     )
     # two extra published that include "roof extension"
@@ -47,9 +47,9 @@ RSpec.describe "BOPS public API" do
       :planning_application, 2,
       :with_boundary_geojson_features,
       :published,
-      local_authority:  local_authority,
+      local_authority: local_authority,
       application_type: application_type,
-      description:      "I want to build a roof extension."
+      description: "I want to build a roof extension."
     )
   end
 
@@ -59,19 +59,19 @@ RSpec.describe "BOPS public API" do
       produces "application/json"
 
       parameter name: :page, in: :query, schema: {
-        type:    :integer,
+        type: :integer,
         default: 1
       }, required: false
 
       parameter name: :resultsPerPage, in: :query, schema: {
-        type:    :integer,
+        type: :integer,
         default: 5,
         minimum: 1,
         maximum: BopsApi::Postsubmission::PostsubmissionPagination::MAXRESULTS_LIMIT
       }, required: false
 
       parameter name: :q, in: :query, schema: {
-        type:        :string,
+        type: :string,
         description: "Search by reference or description"
       }, required: false
 
@@ -81,14 +81,14 @@ RSpec.describe "BOPS public API" do
         let(:q) { planning_applications.first.reference }
 
         run_test! do |response|
-          data     = JSON.parse(response.body)
+          data = JSON.parse(response.body)
           metadata = data["metadata"]
 
           expect(metadata).to eq(
             "resultsPerPage" => resultsPerPage,
-            "currentPage"    => page,
-            "totalPages"     => 1,
-            "totalResults"   => 1
+            "currentPage" => page,
+            "totalPages" => 1,
+            "totalResults" => 1
           )
 
           expect(
@@ -99,10 +99,10 @@ RSpec.describe "BOPS public API" do
 
       it "validates successfully against the example search json" do
         resolved_schema = load_and_resolve_schema(
-          name:    "search",
+          name: "search",
           version: BopsApi::Schemas::DEFAULT_ODP_VERSION
         )
-        schemer      = JSONSchemer.schema(resolved_schema)
+        schemer = JSONSchemer.schema(resolved_schema)
         example_json = example_fixture("public/search.json")
 
         expect(schemer.valid?(example_json)).to eq(true)
@@ -114,14 +114,14 @@ RSpec.describe "BOPS public API" do
         let(:q) { "roof extension" }
 
         run_test! do |response|
-          data     = JSON.parse(response.body)
+          data = JSON.parse(response.body)
           metadata = data["metadata"]
 
           expect(metadata).to eq(
             "resultsPerPage" => resultsPerPage,
-            "currentPage"    => page,
-            "totalPages"     => 1,
-            "totalResults"   => 2
+            "currentPage" => page,
+            "totalPages" => 1,
+            "totalResults" => 2
           )
 
           data["data"].each do |application|
@@ -138,14 +138,14 @@ RSpec.describe "BOPS public API" do
         let(:q) { invalidated.reference }
 
         run_test! do |response|
-          data     = JSON.parse(response.body)
+          data = JSON.parse(response.body)
           metadata = data["metadata"]
 
           expect(metadata).to eq(
             "resultsPerPage" => resultsPerPage,
-            "currentPage"    => page,
-            "totalPages"     => 1,
-            "totalResults"   => 0
+            "currentPage" => page,
+            "totalPages" => 1,
+            "totalResults" => 0
           )
 
           expect(data["data"]).to eq([])
@@ -158,14 +158,14 @@ RSpec.describe "BOPS public API" do
         let(:q) { "no results found" }
 
         run_test! do |response|
-          data     = JSON.parse(response.body)
+          data = JSON.parse(response.body)
           metadata = data["metadata"]
 
           expect(metadata).to eq(
             "resultsPerPage" => resultsPerPage,
-            "currentPage"    => page,
-            "totalPages"     => 1,
-            "totalResults"   => 0
+            "currentPage" => page,
+            "totalPages" => 1,
+            "totalResults" => 0
           )
 
           expect(data["data"]).to eq([])
@@ -175,18 +175,18 @@ RSpec.describe "BOPS public API" do
       response "200", "returns planning applications when searching by an out of range page and resultsPerPage" do
         schema "$ref" => "#/components/schemas/Search"
 
-        let(:page)           { 0 }
+        let(:page) { 0 }
         let(:resultsPerPage) { 100_000 }
 
         run_test! do |response|
-          data     = JSON.parse(response.body)
+          data = JSON.parse(response.body)
           metadata = data["metadata"]
 
           expect(metadata).to eq(
             "resultsPerPage" => BopsApi::Postsubmission::PostsubmissionPagination::MAXRESULTS_LIMIT,
-            "currentPage"    => 1,
-            "totalPages"     => 1,
-            "totalResults"   => 10
+            "currentPage" => 1,
+            "totalPages" => 1,
+            "totalResults" => 10
           )
         end
       end
@@ -195,19 +195,19 @@ RSpec.describe "BOPS public API" do
         schema "$ref" => "#/components/schemas/Search"
         example "application/json", :default, example_fixture("public/search.json")
 
-        let(:page)           { 2 }
+        let(:page) { 2 }
         let(:resultsPerPage) { 2 }
-        let(:q)              { "HAPP" }
+        let(:q) { "HAPP" }
 
         run_test! do |response|
-          data     = JSON.parse(response.body)
+          data = JSON.parse(response.body)
           metadata = data["metadata"]
 
           expect(metadata).to eq(
             "resultsPerPage" => 2,
-            "currentPage"    => page,
-            "totalPages"     => 5,
-            "totalResults"   => 10
+            "currentPage" => page,
+            "totalPages" => 5,
+            "totalResults" => 10
           )
         end
       end
@@ -220,7 +220,7 @@ RSpec.describe "BOPS public API" do
       produces "application/json"
 
       parameter name: :reference, in: :path, schema: {
-        type:        :string,
+        type: :string,
         description: "The planning application reference"
       }
 
@@ -228,8 +228,8 @@ RSpec.describe "BOPS public API" do
         example "application/json", :default, example_fixture("public/show.json")
 
         let!(:planning_application) { planning_applications.first }
-        let!(:appeal)               { create(:appeal, planning_application: planning_application) }
-        let(:reference)             { planning_application.reference }
+        let!(:appeal) { create(:appeal, planning_application: planning_application) }
+        let(:reference) { planning_application.reference }
 
         run_test! do |response|
           data = JSON.parse(response.body)
@@ -240,7 +240,7 @@ RSpec.describe "BOPS public API" do
 
           expect(data["officer"]["name"]).to eq(planning_application.user.name)
 
-          press_notice          = planning_application.press_notice
+          press_notice = planning_application.press_notice
           press_notice_response = data["application"]["pressNotice"]
           expect(press_notice_response["required"]).to eq(press_notice.required)
           expect(press_notice_response["reason"]).to eq(press_notice.reason)

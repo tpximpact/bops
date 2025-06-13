@@ -1,4 +1,3 @@
-# app/services/bops_api/postsubmission/planning_applications_search_service.rb
 # frozen_string_literal: true
 
 module BopsApi
