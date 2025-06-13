@@ -5,32 +5,24 @@
     "metadata": {
       "type": "object",
       "properties": {
-        "page": {
+        "currentPage": {
           "type": "integer"
         },
-        "results": {
+        "resultsPerPage": {
           "type": "integer"
         },
-        "from": {
+        "totalPages": {
           "type": "integer"
         },
-        "to": {
-          "type": "integer"
-        },
-        "total_pages": {
-          "type": "integer"
-        },
-        "total_results": {
+        "totalResults": {
           "type": "integer"
         }
       },
       "required": [
-        "page",
-        "results",
-        "from",
-        "to",
-        "total_pages",
-        "total_results"
+        "currentPage",
+        "resultsPerPage",
+        "totalPages",
+        "totalResults"
       ]
     },
     "links": {
@@ -43,24 +35,13 @@
           "type": "string"
         },
         "prev": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "next": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         }
       },
-      "required": [
-        "first",
-        "last",
-        "prev",
-        "next"
-      ]
+      "required": ["first", "last", "prev", "next"]
     },
     "data": {
       "type": "array",
@@ -148,25 +129,16 @@
                                   ]
                                 }
                               },
-                              "required": [
-                                "type",
-                                "coordinates"
-                              ]
+                              "required": ["type", "coordinates"]
                             },
                             "properties": {
                               "type": ["object", "null"]
                             }
                           },
-                          "required": [
-                            "type",
-                            "geometry",
-                            "properties"
-                          ]
+                          "required": ["type", "geometry", "properties"]
                         }
                       },
-                      "required": [
-                        "site"
-                      ]
+                      "required": ["site"]
                     },
                     {
                       "properties": {
@@ -212,40 +184,25 @@
                                         ]
                                       }
                                     },
-                                    "required": [
-                                      "type",
-                                      "coordinates"
-                                    ]
+                                    "required": ["type", "coordinates"]
                                   },
                                   "properties": {
                                     "type": ["object", "null"]
                                   }
                                 },
-                                "required": [
-                                  "type",
-                                  "geometry",
-                                  "properties"
-                                ]
+                                "required": ["type", "geometry", "properties"]
                               }
                             }
                           },
-                          "required": [
-                            "type",
-                            "features"
-                          ]
+                          "required": ["type", "features"]
                         }
                       },
-                      "required": [
-                        "site"
-                      ]
+                      "required": ["site"]
                     }
                   ]
                 }
               },
-              "required": [
-                "address",
-                "boundary"
-              ]
+              "required": ["address", "boundary"]
             },
             "proposal": {
               "type": "object",
@@ -265,10 +222,7 @@
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "code",
-                        "description"
-                      ]
+                      "required": ["code", "description"]
                     },
                     {
                       "type": "null"
@@ -323,10 +277,7 @@
                   ]
                 },
                 "type": {
-                  "anyOf": [
-                    { "type": "string" },
-                    { "type": "null" }
-                  ]
+                  "anyOf": [{ "type": "string" }, { "type": "null" }]
                 }
               },
               "required": ["type", "address", "ownership", "agent"]
@@ -340,22 +291,15 @@
                       "type": ["string"]
                     }
                   },
-                  "required": [
-                    "name"
-                  ]
-                }, 
+                  "required": ["name"]
+                },
                 {
                   "type": "null"
                 }
               ]
             }
           },
-          "required": [
-            "applicant",
-            "application",
-            "property",
-            "proposal"
-          ]
+          "required": ["applicant", "application", "property", "proposal"]
         }
       ]
     },
@@ -370,9 +314,5 @@
       ]
     }
   },
-  "required": [
-    "metadata",
-    "links",
-    "data"
-  ]
+  "required": ["metadata", "links", "data"]
 }

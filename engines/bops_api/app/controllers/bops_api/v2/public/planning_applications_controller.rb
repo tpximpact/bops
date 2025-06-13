@@ -19,6 +19,13 @@ module BopsApi
             format.json
           end
         end
+
+        private
+
+        def search_service(scope)
+          BopsApi::Postsubmission::PlanningApplicationsSearchService
+            .new(scope, params.permit(:q, :page, :resultsPerPage))
+        end
       end
     end
   end

@@ -1,11 +1,9 @@
 {
   "metadata": {
-    "page": 2,
-    "results": 2,
-    "from": 3,
-    "to": 4,
-    "total_pages": 5,
-    "total_results": 10
+    "currentPage": 2,
+    "resultsPerPage": 2,
+    "totalPages": 5,
+    "totalResults": 10
   },
   "links": {
     "first": "/api/v2/public/planning_applications/search?page=1&maxresults=2",
