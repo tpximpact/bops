@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "swagger_helper"
-
 RSpec.describe "Public Neighbour Responses API", type: :request do
   let(:local_authority) { create(:local_authority, :default) }
   let(:application_type) { create(:application_type, :householder) }
