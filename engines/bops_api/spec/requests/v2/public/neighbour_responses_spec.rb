@@ -55,6 +55,21 @@ RSpec.describe "BOPS public API Public comments" do
         description: "Search by redacted comment content"
       }, required: false
 
+      parameter name: :sentiment, in: :query, schema: {
+        type: :string,
+        description: "Search by sentiment"
+      }, required: false
+
+      parameter name: :publishedAtFrom, in: :query, schema: {
+        type: :date,
+        description: "Search by publishedAtFrom"
+      }, required: false
+
+      parameter name: :publishedAtTo, in: :query, schema: {
+        type: :date,
+        description: "Search by publishedAtTo"
+      }, required: false
+
       def validate_pagination(data, results_per_page:, current_page:, total_results:, total_available_items:)
         expect(data["pagination"]["resultsPerPage"]).to eq(results_per_page)
         expect(data["pagination"]["currentPage"]).to eq(current_page)
@@ -144,6 +159,109 @@ RSpec.describe "BOPS public API Public comments" do
           expect(data["comments"].first["comment"]).to include("***** not like the other comments")
         end
       end
+
+      response "200", "returns a planning application's public comments filtering by sentiment" do
+        before do
+          create(:neighbour_response, response: "rude word not like the other comments", redacted_response: "***** not like the other comments", summary_tag: "neutral", neighbour: create(:neighbour, consultation: planning_application.consultation))
+        end
+
+        let(:reference) { planning_application.reference }
+        let(:sentiment) { "neutral" }
+
+        run_test! do |response|
+          data = JSON.parse(response.body)
+          Rails.logger.debug "Sentiment filter: #{data}"
+          # pagination
+          validate_pagination(data, results_per_page: BopsApi::Postsubmission::PostsubmissionPagination::DEFAULT_MAXRESULTS, current_page: BopsApi::Postsubmission::PostsubmissionPagination::DEFAULT_PAGE, total_items: 1)
+
+          # comment summary
+          expect(data["summary"]["totalComments"]).to eq(51)
+          expect(data["summary"]["sentiment"]["neutral"]).to eq(1)
+
+          # comments
+          validate_comments(data, count: 1, total_items: 1)
+        end
+      end
+
+      response "200", "returns comments filtered by publishedAtFrom and publishedAtTo" do
+        let(:reference) { planning_application.reference }
+
+        let!(:older_comment) do
+          create(:neighbour_response,
+            redacted_response: "***** old comment",
+            neighbour: create(:neighbour, consultation: planning_application.consultation),
+            created_at: 2.weeks.ago,
+            updated_at: 2.weeks.ago)
+        end
+
+        let!(:middle_comment) do
+          create(:neighbour_response,
+            redacted_response: "***** middle comment",
+            neighbour: create(:neighbour, consultation: planning_application.consultation),
+            created_at: 1.week.ago,
+            updated_at: 1.week.ago)
+        end
+
+        let!(:recent_comment) do
+          create(:neighbour_response,
+            redacted_response: "***** recent comment",
+            neighbour: create(:neighbour, consultation: planning_application.consultation),
+            created_at: Time.zone.now,
+            updated_at: Time.zone.now)
+        end
+
+        context "when filtering using publishedAtFrom" do
+          let(:publishedAtFrom) { 2.days.ago.iso8601 }
+
+          run_test! do |response|
+            data = JSON.parse(response.body)
+
+            filtered_comments = data["comments"]
+            expect(filtered_comments.count).to eq(BopsApi::Postsubmission::PostsubmissionPagination::DEFAULT_MAXRESULTS)
+            expect(filtered_comments.first["comment"]).to include("***** recent comment")
+
+            filtered_comments.each do |comment|
+              expect(DateTime.iso8601(comment["receivedAt"])).to be >= DateTime.iso8601(publishedAtFrom).utc
+            end
+          end
+        end
+
+        context "when filtering using publishedAtTo" do
+          let(:publishedAtTo) { 1.days.ago.iso8601 }
+
+          run_test! do |response|
+            data = JSON.parse(response.body)
+
+            filtered_comments = data["comments"]
+            expect(filtered_comments.count).to eq(2)
+            expect(filtered_comments.first["comment"]).to include("***** middle comment")
+
+            filtered_comments.each do |comment|
+              expect(DateTime.iso8601(comment["receivedAt"])).to be <= DateTime.iso8601(publishedAtTo).utc
+            end
+          end
+        end
+
+        context "when filtering using both publishedAtFrom and publishedAtTo" do
+          let(:publishedAtFrom) { 10.days.ago.iso8601 }
+          let(:publishedAtTo) { 1.day.from_now.iso8601 }
+
+          run_test! do |response|
+            data = JSON.parse(response.body)
+
+            filtered_comments = data["comments"]
+            expect(filtered_comments.count).to eq(10)
+            expect(filtered_comments.first["comment"]).to include("***** recent comment")
+
+            filtered_comments.each do |comment|
+              received_at = DateTime.iso8601(comment["receivedAt"]).utc
+              expect(received_at).to be >= DateTime.iso8601(publishedAtFrom).utc
+              expect(received_at).to be <= DateTime.iso8601(publishedAtTo).utc
+            end
+          end
+        end
+      end
+
 
       response "200", "returns a planning application's public comments filtering by sortBy and orderBy" do
         let(:reference) { planning_application.reference }
