@@ -22081,21 +22081,42 @@ paths:
               properties:
                 address:
                   type: string
+                  enum:
+                    - '123 Street, London, E1 6LT'
+                  example: '123 Street, London, E1 6LT'
                 name:
                   type: string
+                  enum:
+                    - Jo Blogs
+                  example: Jo Blogs
                 email:
                   type: string
+                  enum:
+                    - jo@example.com
+                  example: jo@example.com
                 response:
                   type: string
+                  enum:
+                    - I like it
+                  example: I like it
                 summary_tag:
                   type: string
+                  enum:
+                    - supportive
+                  example: supportive
                 tags:
                   type: array
                   items:
                     type: string
+                    enum:
+                      - privacy
+                    example: privacy
               required:
+              - name
               - address
               - response
+              - summary_tag
+              - tags
   "/api/v2/planning_applications/{reference}/validation_requests":
     get:
       summary: Retrieves the validation requests for an application
