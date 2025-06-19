@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "../../../swagger_helper"
+
 RSpec.describe "Public Neighbour Responses API", type: :request do
   let(:local_authority) { create(:local_authority, :default) }
   let(:application_type) { create(:application_type, :householder) }
@@ -7,9 +9,9 @@ RSpec.describe "Public Neighbour Responses API", type: :request do
   let(:consultation) { planning_application.consultation }
   let!(:neighbour) { create(:neighbour, consultation:, address: "123 Test Street, London, W1 1AA") }
 
-  # let(:token) { "bops_EjWSP1javBbvZFtRYiWs6y5orH4R748qapSGLNZsJw" }
-  # let!(:api_user) { create(:api_user, token:, local_authority:) }
-  # let!(:Authorization) { "Bearer #{token}" }
+  let(:token) { "bops_EjWSP1javBbvZFtRYiWs6y5orH4R748qapSGLNZsJw" }
+  let!(:api_user) { create(:api_user, :comment_rw, token:, local_authority:) }
+  let!(:Authorization) { "Bearer #{token}" }
 
   path "/api/v2/planning_applications/{reference}/comments/public" do
     post "Submit a public neighbour response" do

@@ -36,5 +36,15 @@ FactoryBot.define do
     trait :validation_requests_rw do
       permissions { ["validation_request:read", "validation_request:write"] }
     end
+
+    trait :comment_ro do
+      name { "DPR" }
+      permissions { ["comment:read"] }
+    end
+
+    trait :comment_rw do
+      name { "DPR" }
+      permissions { ["comment:read", "comment:write"] }
+    end
   end
 end

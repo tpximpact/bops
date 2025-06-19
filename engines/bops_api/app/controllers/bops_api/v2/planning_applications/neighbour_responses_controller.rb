@@ -17,6 +17,8 @@ module BopsApi
         rescue NeighbourResponse::NeighbourResponseCreationService::CreateError => e
           render json: {error: e.message}, status: :unprocessable_entity
         end
+        def required_api_key_scope = "comment"
+        end
       end
     end
   end
