@@ -54,22 +54,5 @@ RSpec.describe NeighbourResponseCreationService do
         expect(consultation.neighbours.count).to eq(1)
       end
     end
-
-    # context "when response is invalid" do
-    #   let(:params) do
-    #     ActionController::Parameters.new(
-    #       address: "Missing Response Avenue"
-    #       # response is missing
-    #     )
-    #   end
-
-    #   it "raises a CreateError" do
-    #     service = described_class.new(planning_application:, params:)
-
-    #     expect {
-    #       service.call
-    #     }.to raise_error(NeighbourResponse::NeighbourResponseCreationService::CreateError)
-    #   end
-    # end
   end
 end
