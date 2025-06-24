@@ -12,13 +12,27 @@ module BopsApi
           end
           @neighbour_responses = @consultation.neighbour_responses.redacted
 
+          raw_query_string = request.env['QUERY_STRING']
+          sentiments = extract_sentiments_from_query(raw_query_string)
+          updated_params = pagination_params.to_h.merge(sentiment: sentiments)
+
           @pagy, @comments = BopsApi::Postsubmission::CommentsPublicService.new(
             @neighbour_responses,
-            pagination_params
+            updated_params
           ).call
 
           @total_responses = @neighbour_responses.count
           @response_summary = @neighbour_responses.group(:summary_tag).count
+          Rails.logger.debug("Filtering by sentiments: #{@response_summary}")
+          Rails.logger.debug("Raw query string: #{request.query_string}")
+          Rails.logger.debug("Sentiment param: #{params[:sentiment]}")
+          Rails.logger.debug("Query params: #{request.query_parameters}")
+          Rails.logger.debug("get_all sentiment: #{request.GET['sentiment']}")
+
+          Rails.logger.debug("Sentiments wrapped: #{sentiments}")
+          Rails.logger.debug("Request: #{request}")
+          Rails.logger.debug("RAW ENV: #{request.env['QUERY_STRING']}")
+          
           @response_summary = {
             supportive: @response_summary["supportive"] || 0,
             objection: @response_summary["objection"] || 0,
@@ -34,7 +48,11 @@ module BopsApi
 
         # Permit and return the required parameters
         def pagination_params
-          params.permit(:sortBy, :orderBy, :resultsPerPage, :sentiment, :query, :page, :format, :planning_application_id)
+          params.permit(:sortBy, :orderBy, :resultsPerPage, :query, :page, :format, :planning_application_id, :sentiment)
+        end
+        def extract_sentiments_from_query(query_string)
+          # Use a regular expression to find all occurrences of the sentiment parameter
+          query_string.scan(/sentiment=([^&]*)/).flatten
         end
       end
     end
