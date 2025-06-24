@@ -12,6 +12,10 @@ module BopsApi
           "id" => {column: "neighbour_responses.id", default_order: "asc"}
         }
       end
+
+      def sentiment_mapping
+        %w[supportive objection neutral]
+      end
     end
   end
 end
