@@ -23,15 +23,6 @@ module BopsApi
 
           @total_responses = @neighbour_responses.count
           @response_summary = @neighbour_responses.group(:summary_tag).count
-          Rails.logger.debug("Filtering by sentiments: #{@response_summary}")
-          Rails.logger.debug("Raw query string: #{request.query_string}")
-          Rails.logger.debug("Sentiment param: #{params[:sentiment]}")
-          Rails.logger.debug("Query params: #{request.query_parameters}")
-          Rails.logger.debug("get_all sentiment: #{request.GET['sentiment']}")
-
-          Rails.logger.debug("Sentiments wrapped: #{sentiments}")
-          Rails.logger.debug("Request: #{request}")
-          Rails.logger.debug("RAW ENV: #{request.env['QUERY_STRING']}")
           
           @response_summary = {
             supportive: @response_summary["supportive"] || 0,

@@ -12,6 +12,9 @@ module BopsApi
           "id" => {column: "consultee_responses.id", default_order: "asc"}
         }
       end
+      def sentiment_mapping
+        %w[approved amendments_needed objected]
+      end
     end
   end
 end
