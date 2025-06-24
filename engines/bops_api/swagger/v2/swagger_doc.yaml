@@ -35343,7 +35343,7 @@ paths:
           type: array
           items:
             type: string
-            enum: [ approved, amendments_needed, objected ]
+            enum: [ approved, amendmentsNeeded, objected ]
         style: form
         explode: true   
       responses:

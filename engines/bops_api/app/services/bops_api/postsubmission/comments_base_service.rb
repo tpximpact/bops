@@ -29,12 +29,15 @@ module BopsApi
         # Filter by sentiment
         if params[:sentiment].present?
           sentiments = Array.wrap(params[:sentiment])
-          # Rails.logger.debug("get_all sentiment 2: #{request.GET['sentiment']}")
-          Rails.logger.debug("Sentiments wrapped: #{sentiments}")
-          Rails.logger.debug("Params: #{params}")
-          scope = scope.where(summary_tag: sentiments)
+          normalized = sentiments.map { |s| s == "amendmentsNeeded" ? "amendments_needed" : s }
+        
+          unless normalized.all? { |s| sentiment_mapping.include?(s) }
+            raise ArgumentError, "Invalid sentiment field."
+          end
+        
+          scope = scope.where(summary_tag: normalized)
         end
-
+        
         scope
       end
 
