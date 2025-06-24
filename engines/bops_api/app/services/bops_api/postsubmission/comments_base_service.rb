@@ -28,7 +28,11 @@ module BopsApi
 
         # Filter by sentiment
         if params[:sentiment].present?
-          scope = scope.where(summary_tag: params[:sentiment])
+          sentiments = Array.wrap(params[:sentiment])
+          # Rails.logger.debug("get_all sentiment 2: #{request.GET['sentiment']}")
+          Rails.logger.debug("Sentiments wrapped: #{sentiments}")
+          Rails.logger.debug("Params: #{params}")
+          scope = scope.where(summary_tag: sentiments)
         end
 
         scope
