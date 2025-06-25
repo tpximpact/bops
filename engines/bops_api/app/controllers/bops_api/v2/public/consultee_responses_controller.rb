@@ -41,7 +41,7 @@ module BopsApi
 
         def normalize_sentiments_from_query_string(query_string)
           query_string.scan(/sentiment=([^&]*)/).flatten.map do |s|
-            s == "amendmentsNeeded" ? "amendments_needed" : s
+            (s == "amendmentsNeeded") ? "amendments_needed" : s
           end
         end
       end
