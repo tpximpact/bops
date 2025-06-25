@@ -26,6 +26,16 @@ module BopsApi
           scope = scope.where("redacted_response ILIKE ?", "%#{params[:query]}%")
         end
 
+        # Filter by sentiment
+        if params[:sentiment].present?
+          sentiments = Array.wrap(params[:sentiment])
+          normalized = sentiments.map { |s| ((s == "amendmentsNeeded") ? "amendments_needed" : s) }
+          unless normalized.all? { |s| sentiment_mapping.include?(s) }
+            raise ArgumentError, "Invalid sentiment field."
+          end
+          scope = scope.where(summary_tag: normalized)
+        end
+
         scope
       end
 
