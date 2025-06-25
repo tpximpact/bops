@@ -94,15 +94,15 @@ RSpec.describe BopsApi::Postsubmission::CommentsPublicService, type: :service do
 
     context "when a sentiment array is provided and only one item matches" do
       let(:params) { {sentiment: ["supportive", "neutral"]} }
-    
+
       it "filters the scope by the sentiment and returns results for the matching item only" do
         # Assume that only "supportive" has matching results in the scope
         matching_scope = scope.where(summary_tag: "supportive")
         allow(scope).to receive(:where).with(summary_tag: ["supportive", "neutral"]).and_return(matching_scope)
         allow_any_instance_of(BopsApi::Postsubmission::PostsubmissionPagination).to receive(:call).and_return([nil, matching_scope])
-    
+
         _, result = service.call
-    
+
         expect(result).to eq(matching_scope)
       end
     end
