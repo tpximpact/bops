@@ -37,7 +37,7 @@ RSpec.describe BopsApi::Postsubmission::CommentsPublicService, type: :service do
     end
 
     context "when a multiple sentiment parameter is provided" do
-      let(:params) { { sentiment: ["supportive", "neutral"] } }
+      let(:params) { {sentiment: ["supportive", "neutral"]} }
 
       it "filters the scope by the sentiment" do
         filtered_scope = scope.where(summary_tag: ["supportive", "neutral"])
@@ -51,7 +51,7 @@ RSpec.describe BopsApi::Postsubmission::CommentsPublicService, type: :service do
     end
 
     context "when supportive sentiment parameter is provided" do
-      let(:params) { { sentiment: ["supportive"] } }
+      let(:params) { {sentiment: ["supportive"]} }
 
       it "filters the scope by the sentiment" do
         filtered_scope = scope.where(summary_tag: ["supportive"])
@@ -65,7 +65,7 @@ RSpec.describe BopsApi::Postsubmission::CommentsPublicService, type: :service do
     end
 
     context "when neutral sentiment parameter is provided" do
-      let(:params) { { sentiment: ["neutral"] } }
+      let(:params) { {sentiment: ["neutral"]} }
 
       it "filters the scope by the sentiment" do
         filtered_scope = scope.where(summary_tag: ["neutral"])
@@ -79,7 +79,7 @@ RSpec.describe BopsApi::Postsubmission::CommentsPublicService, type: :service do
     end
 
     context "when objection sentiment parameter is provided" do
-      let(:params) { { sentiment: ["objection"] } }
+      let(:params) { {sentiment: ["objection"]} }
 
       it "filters the scope by the sentiment" do
         filtered_scope = scope.where(summary_tag: ["objection"])
@@ -93,7 +93,7 @@ RSpec.describe BopsApi::Postsubmission::CommentsPublicService, type: :service do
     end
 
     context "when a sentiment array is provided and only one item matches" do
-      let(:params) { { sentiment: ["supportive", "neutral"] } }
+      let(:params) { {sentiment: ["supportive", "neutral"]} }
     
       it "filters the scope by the sentiment and returns results for the matching item only" do
         # Assume that only "supportive" has matching results in the scope

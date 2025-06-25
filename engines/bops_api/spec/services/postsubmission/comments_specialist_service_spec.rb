@@ -37,7 +37,7 @@ RSpec.describe BopsApi::Postsubmission::CommentsSpecialistService, type: :servic
     end
 
     context "when a multiple sentiment parameter is provided" do
-      let(:params) { { sentiment: ["approved", "amendmentsNeeded"] } }
+      let(:params) { {sentiment: ["approved", "amendmentsNeeded"]} }
 
       it "filters the scope by the sentiment" do
         filtered_scope = scope.where(summary_tag: ["approved", "amendments_needed"])
@@ -51,7 +51,7 @@ RSpec.describe BopsApi::Postsubmission::CommentsSpecialistService, type: :servic
     end
 
     context "when approved sentiment parameter is provided" do
-      let(:params) { { sentiment: ["approved"] } }
+      let(:params) { {sentiment: ["approved"]} }
 
       it "filters the scope by the sentiment" do
         filtered_scope = scope.where(summary_tag: ["approved"])
@@ -65,7 +65,7 @@ RSpec.describe BopsApi::Postsubmission::CommentsSpecialistService, type: :servic
     end
 
     context "when amendmentsNeeded sentiment parameter is provided" do
-      let(:params) { { sentiment: ["amendmentsNeeded"] } }
+      let(:params) { {sentiment: ["amendmentsNeeded"]} }
 
       it "filters the scope by the sentiment" do
         filtered_scope = scope.where(summary_tag: ["amendments_needed"])
@@ -79,7 +79,7 @@ RSpec.describe BopsApi::Postsubmission::CommentsSpecialistService, type: :servic
     end
 
     context "when objected sentiment parameter is provided" do
-      let(:params) { { sentiment: ["objected"] } }
+      let(:params) { {sentiment: ["objected"]} }
 
       it "filters the scope by the sentiment" do
         filtered_scope = scope.where(summary_tag: ["objected"])
@@ -93,7 +93,7 @@ RSpec.describe BopsApi::Postsubmission::CommentsSpecialistService, type: :servic
     end
 
     context "when a sentiment array is provided and only one item matches" do
-      let(:params) { { sentiment: ["approved", "objected"] } }
+      let(:params) { {sentiment: ["approved", "objected"]} }
     
       it "filters the scope by the sentiment and returns results for the matching item only" do
         # Assume that only "supportive" has matching results in the scope
