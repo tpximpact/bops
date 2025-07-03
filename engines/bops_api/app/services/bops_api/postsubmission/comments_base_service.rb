@@ -29,11 +29,13 @@ module BopsApi
         # Filter by sentiment
         if params[:sentiment].present?
           sentiments = Array.wrap(params[:sentiment])
-          normalized = sentiments.map { |s| ((s == "amendmentsNeeded") ? "amendments_needed" : s) }
-          unless normalized.all? { |s| sentiment_mapping.include?(s) }
+            .flat_map { |s| s.to_s.split(",") }
+            .map { |s| s.strip.underscore if s.present? }
+            .compact
+          unless sentiments.all? { |s| sentiment_mapping.include?(s) }
             raise ArgumentError, "Invalid sentiment field."
           end
-          scope = scope.where(summary_tag: normalized)
+          scope = scope.where(summary_tag: sentiments)
         end
 
         scope

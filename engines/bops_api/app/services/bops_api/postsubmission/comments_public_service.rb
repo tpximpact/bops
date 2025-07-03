@@ -14,7 +14,7 @@ module BopsApi
       end
 
       def sentiment_mapping
-        %w[supportive objection neutral]
+        NeighbourResponse.summary_tags.keys
       end
     end
   end
