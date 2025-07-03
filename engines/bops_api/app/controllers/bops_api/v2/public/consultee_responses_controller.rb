@@ -14,7 +14,6 @@ module BopsApi
 
           sentiments = normalize_sentiments_from_query_string(request.env["QUERY_STRING"])
           updated_params = pagination_params.to_h.merge(sentiment: sentiments)
-
           @total_responses = @consultee_responses.count
           @total_consulted = @consultation.consultees.count
 

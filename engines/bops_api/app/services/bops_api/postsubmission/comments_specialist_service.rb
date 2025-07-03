@@ -14,7 +14,7 @@ module BopsApi
       end
 
       def sentiment_mapping
-        %w[approved amendments_needed objected]
+        Consultee::Response.summary_tags.keys
       end
     end
   end
