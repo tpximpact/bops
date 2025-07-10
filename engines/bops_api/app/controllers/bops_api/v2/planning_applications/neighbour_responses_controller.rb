@@ -4,8 +4,8 @@ module BopsApi
   module V2
     module PlanningApplications
       class NeighbourResponsesController < AuthenticatedController
-        before_action :set_planning_application 
-        before_action :set_consultation 
+        before_action :set_planning_application
+        before_action :set_consultation
         before_action :build_neighbour_response
 
         def create
@@ -34,14 +34,16 @@ module BopsApi
 
         private
 
-        def set_planning_application 
-          @planning_application = find_planning_application(params[:planning_application_id]) 
-        end 
-        def set_consultation 
-          @consultation = @planning_application.consultation 
-        end 
-        def build_neighbour_response 
-          @neighbour_response = @consultation.neighbour_responses.new(response_attributes) 
+        def set_planning_application
+          @planning_application = find_planning_application(params[:planning_application_id])
+        end
+
+        def set_consultation
+          @consultation = @planning_application.consultation
+        end
+
+        def build_neighbour_response
+          @neighbour_response = @consultation.neighbour_responses.new(response_attributes)
         end
 
         def find_or_create_neighbour
