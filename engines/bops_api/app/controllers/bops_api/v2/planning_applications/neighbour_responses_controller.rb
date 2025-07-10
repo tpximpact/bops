@@ -4,12 +4,12 @@ module BopsApi
   module V2
     module PlanningApplications
       class NeighbourResponsesController < AuthenticatedController
-        def create
-          @planning_application = find_planning_application(params[:planning_application_id])
-          @consultation = @planning_application.consultation
-          neighbour_response = build_neighbour_response
+        before_action :set_planning_application 
+        before_action :set_consultation 
+        before_action :build_neighbour_response
 
-          neighbour_response.save!
+        def create
+          build_neighbour_response.save!
 
           render json: {
             data: nil,
@@ -34,10 +34,14 @@ module BopsApi
 
         private
 
-        def build_neighbour_response
-          @consultation.neighbour_responses.build(response_attributes).tap do |response|
-            response.neighbour = find_or_create_neighbour
-          end
+        def set_planning_application 
+          @planning_application = find_planning_application(params[:planning_application_id]) 
+        end 
+        def set_consultation 
+          @consultation = @planning_application.consultation 
+        end 
+        def build_neighbour_response 
+          @neighbour_response = @consultation.neighbour_responses.new(response_attributes) 
         end
 
         def find_or_create_neighbour
@@ -50,10 +54,9 @@ module BopsApi
         end
 
         def response_attributes
-          response_params.except(:address, :planning_application_id).merge!(
-            received_at: Time.zone.now,
-            consultation_id: @consultation.id
-          )
+          params
+            .permit(:name, :email, :response, :summary_tag, tags: [])
+            .merge(received_at: Time.zone.now, neighbour: find_or_create_neighbour)
         end
 
         def response_params
