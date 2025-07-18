@@ -53,11 +53,20 @@ json.specialists do
 
         if resp.documents.any?
           json.files resp.documents do |document|
-            json.id document.id.to_s
-            json.fileName document.file_attachment.filename
-            json.fileType document.file_attachment.content_type
+            json.id document.id
+            json.name document.file_attachment.filename
+            json.association "comment"
+            json.type document.file_attachment.content_type
             json.url document.blob_url
-            json.byteSize document.file_attachment.byte_size
+
+            json.metadata do
+              json.size do
+                json.bytes document.file_attachment.blob.byte_size
+              end
+              json.mimeType document.file_attachment.blob.content_type
+              json.createdAt format_postsubmission_datetime(document.created_at)
+              json.submittedAt format_postsubmission_datetime(document.received_at)
+            end
           end
         end
 
