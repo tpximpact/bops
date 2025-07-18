@@ -31,7 +31,7 @@
       },
       "required": ["totalComments", "totalConsulted", "sentiment"]
     },
-        "comments": {
+    "comments": {
       "type": "object",
       "properties": {
         "specialists": {
@@ -62,18 +62,27 @@
                     "metadata": {
                       "type": "object",
                       "properties": {
-                        "submittedAt": { "type": "string", "format": "date-time" },
-                        "validatedAt": { "type": ["string", "null"], "format": "date-time" },
-                        "publishedAt": { "type": ["string", "null"], "format": "date-time" }
+                        "submittedAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "validatedAt": {
+                          "type": ["string", "null"],
+                          "format": "date-time"
+                        },
+                        "publishedAt": {
+                          "type": ["string", "null"],
+                          "format": "date-time"
+                        }
                       },
-                      "required": ["submittedAt", "validatedAt", "publishedAt"]
+                      "required": ["submittedAt"]
                     }
                   },
                   "required": ["id", "sentiment", "commentRedacted", "metadata"]
                 }
               }
             },
-            "required": ["id", "organisationSpecialism", "jobTitle", "reason", "firstConsultedAt", "comments"]
+            "required": ["id", "firstConsultedAt", "comments"]
           }
         }
       },
