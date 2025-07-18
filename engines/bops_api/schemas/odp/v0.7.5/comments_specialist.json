@@ -59,6 +59,20 @@
                     "id": { "type": "string" },
                     "sentiment": { "type": "string" },
                     "commentRedacted": { "type": "string" },
+                    "files": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "string" },
+                          "fileName": { "type": "string" },
+                          "fileType": { "type": "string" },
+                          "url": { "type": "string", "format": "uri" },
+                          "byteSize": { "type": "integer" }
+                        },
+                        "required": ["id", "fileName"]
+                      }
+                    },
                     "metadata": {
                       "type": "object",
                       "properties": {

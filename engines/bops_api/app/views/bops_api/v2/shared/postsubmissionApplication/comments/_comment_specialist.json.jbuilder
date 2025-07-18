@@ -51,6 +51,16 @@ json.specialists do
         json.sentiment resp.summary_tag.camelize(:lower)
         json.commentRedacted resp.redacted_response
 
+        if resp.documents.any?
+          json.files resp.documents do |document|
+            json.id document.id.to_s
+            json.fileName document.file_attachment.filename
+            json.fileType document.file_attachment.content_type
+            json.url document.blob_url
+            json.byteSize document.file_attachment.byte_size
+          end
+        end
+
         json.metadata do
           json.submittedAt format_postsubmission_datetime(resp.created_at)
           # json.validatedAt format_postsubmission_datetime(resp.redacted_at)
