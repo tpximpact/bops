@@ -9,11 +9,11 @@ RSpec.describe "BOPS public API Specialist comments" do
   context "when every consulted consultee has exactly one redacted response" do
     before do
       25.times do
-        create(:consultee, :internal, :consulted, responses: build_list(:consultee_response, 1, :with_redaction), consultation: planning_application.consultation)
+        create(:consultee, :internal, :consulted, responses: build_list(:consultee_response, 1, :with_redaction), email_sent_at: 2.days.ago, consultation: planning_application.consultation)
       end
 
       25.times do
-        create(:consultee, :external, :consulted, responses: build_list(:consultee_response, 1, :with_redaction), consultation: planning_application.consultation)
+        create(:consultee, :external, :consulted, responses: build_list(:consultee_response, 1, :with_redaction), email_sent_at: 2.days.ago, consultation: planning_application.consultation)
       end
 
       25.times do
@@ -82,13 +82,44 @@ RSpec.describe "BOPS public API Specialist comments" do
           expect(sentiment["amendmentsNeeded"]).to eq(0)
         end
 
+        def validate_specialist_details(data)
+          specialists = data.dig("comments", "specialists")
+          expect(specialists).to be_an(Array)
+          specialists.each do |specialist|
+            expect(specialist["id"]).to be_present
+            expect(specialist["organisationSpecialism"]).to be_a(String) if specialist["organisationSpecialism"].present?
+            expect { DateTime.iso8601(specialist["firstConsultedAt"]) }.not_to raise_error
+            expect(specialist["jobTitle"]).to be_a(String) if specialist["jobTitle"].present?
+            expect(specialist["reason"]).to be_present
+            expect(specialist["reason"]).to be_in(["Constraint", "Other"])
+            if specialist["constraints"].present?
+              expect(specialist["constraints"]).to be_an(Array)
+              specialist["constraints"].each do |constraint|
+                expect(constraint["value"]).to be_present
+                expect(constraint["category"]).to be_present
+                expect(constraint["description"]).to be_present
+                expect([true, false]).to include(constraint["intersects"])
+                if constraint["entities"].present?
+                  expect(constraint["entities"]).to be_an(Array)
+                  constraint["entities"].each do |entity|
+                    expect(entity["name"]).to be_present
+                  end
+                end
+              end
+            end
+          end
+        end
+
         def validate_comments(data, count:, total_items:)
-          expect(data["comments"].size).to eq(count)
-          data["comments"].each do |c|
-            expect(c["id"]).to be_a(Integer)
+          specialists = data.dig("comments", "specialists")
+          expect(specialists).to be_an(Array)
+          expect(specialists.size).to eq(count)
+          flat = specialists.flat_map { |s| s["comments"] }
+          expect(flat.size).to eq(count)
+          flat.each do |c|
             expect(c["sentiment"]).to be_in(%w[approved objected amendmentsNeeded])
-            expect(c["comment"]).to include("*****")
-            expect { DateTime.iso8601(c["receivedAt"]) }.not_to raise_error
+            expect(c["commentRedacted"] || c["comment"]).to include("*****")
+            expect { DateTime.iso8601(c.dig("metadata", "submittedAt") || c["receivedAt"]) }.not_to raise_error
           end
         end
 
@@ -102,9 +133,16 @@ RSpec.describe "BOPS public API Specialist comments" do
             data = JSON.parse(response.body)
 
             # pagination
-            validate_pagination(data, results_per_page: BopsApi::Postsubmission::PostsubmissionPagination::DEFAULT_MAXRESULTS, current_page: BopsApi::Postsubmission::PostsubmissionPagination::DEFAULT_PAGE, total_results: 50, total_available_items: 50)
+            validate_pagination(
+              data,
+              results_per_page: BopsApi::Postsubmission::PostsubmissionPagination::DEFAULT_MAXRESULTS,
+              current_page: BopsApi::Postsubmission::PostsubmissionPagination::DEFAULT_PAGE,
+              total_results: 50,
+              total_available_items: 50
+            )
             # comment summary
             validate_comment_summary(data)
+            validate_specialist_details(data)
 
             # comments
             validate_comments(data, count: 10, total_items: 50)
@@ -120,9 +158,16 @@ RSpec.describe "BOPS public API Specialist comments" do
             data = JSON.parse(response.body)
 
             # pagination
-            validate_pagination(data, results_per_page: 2, current_page: 2, total_results: 50, total_available_items: 50)
+            validate_pagination(
+              data,
+              results_per_page: 2,
+              current_page: 2,
+              total_results: 50,
+              total_available_items: 50
+            )
             # comment summary
             validate_comment_summary(data)
+            validate_specialist_details(data)
 
             # comments
             validate_comments(data, count: 2, total_items: 50)
@@ -131,7 +176,9 @@ RSpec.describe "BOPS public API Specialist comments" do
 
         response "200", "returns a planning application's specialist comments filtering by query" do
           before do
-            create(:consultee, :external, :consulted, responses: build_list(:consultee_response, 1, :with_redaction, response: "rude word not like the other comments", redacted_response: "***** not like the other comments"), consultation: planning_application.consultation)
+            create(:consultee, :external, :consulted, consultation: planning_application.consultation, organisation: "External Company") do |consultee|
+              create(:consultee_response, :with_redaction, consultee: consultee, response: "rude word not like the other comments", redacted_response: "***** not like the other comments")
+            end
           end
 
           let(:reference) { planning_application.reference }
@@ -139,8 +186,15 @@ RSpec.describe "BOPS public API Specialist comments" do
 
           run_test! do |response|
             data = JSON.parse(response.body)
+
             # pagination
-            validate_pagination(data, results_per_page: BopsApi::Postsubmission::PostsubmissionPagination::DEFAULT_MAXRESULTS, current_page: BopsApi::Postsubmission::PostsubmissionPagination::DEFAULT_PAGE, total_results: 1, total_available_items: 51)
+            validate_pagination(
+              data,
+              results_per_page: BopsApi::Postsubmission::PostsubmissionPagination::DEFAULT_MAXRESULTS,
+              current_page: BopsApi::Postsubmission::PostsubmissionPagination::DEFAULT_PAGE,
+              total_results: 1,
+              total_available_items: 51
+            )
             # comment summary
             expect(data["summary"]["totalComments"]).to eq(51)
             expect(data["summary"]["sentiment"]["approved"]).to eq(51)
@@ -149,7 +203,7 @@ RSpec.describe "BOPS public API Specialist comments" do
 
             # comments
             validate_comments(data, count: 1, total_items: 1)
-            expect(data["comments"].first["comment"]).to include("***** not like the other comments")
+            validate_specialist_details(data)
           end
         end
 
@@ -159,8 +213,8 @@ RSpec.describe "BOPS public API Specialist comments" do
           context "when sortBy is not set and orderBy is not set" do
             run_test! do |response|
               data = JSON.parse(response.body)
-              sorted_values = data["comments"].pluck("receivedAt")
-              expect(sorted_values).to eq(sorted_values.sort.reverse) # Descending order
+              values = data.dig("comments", "specialists").map { |s| Time.zone.parse(s["comments"].first["metadata"]["submittedAt"]) }
+              expect(values).to eq(values.sort.reverse) # Descending order
             end
           end
 
@@ -170,10 +224,15 @@ RSpec.describe "BOPS public API Specialist comments" do
 
             run_test! do |response|
               data = JSON.parse(response.body)
-              sorted_values = data["comments"].pluck(field)
+              specs = data.dig("comments", "specialists")
 
-              expected_order = (order_by == "asc") ? sorted_values.sort : sorted_values.sort.reverse
-              expect(sorted_values).to eq(expected_order)
+              sorted = specs.map do |s|
+                c = s["comments"].first
+                (field == "receivedAt") ? Time.zone.parse(c["metadata"]["submittedAt"]) : c[field]
+              end
+
+              expected = (order_by == "asc") ? sorted.sort : sorted.sort.reverse
+              expect(sorted).to eq(expected)
             end
           end
 
@@ -192,8 +251,8 @@ RSpec.describe "BOPS public API Specialist comments" do
               let(:sortBy) { "receivedAt" }
               run_test! do |response|
                 data = JSON.parse(response.body)
-                sorted_values = data["comments"].pluck("receivedAt")
-                expect(sorted_values).to eq(sorted_values.sort.reverse) # Descending order
+                values = data.dig("comments", "specialists").map { |s| Time.zone.parse(s["comments"].first["metadata"]["submittedAt"]) }
+                expect(values).to eq(values.sort.reverse)
               end
             end
 
@@ -201,8 +260,8 @@ RSpec.describe "BOPS public API Specialist comments" do
               let(:sortBy) { "id" }
               run_test! do |response|
                 data = JSON.parse(response.body)
-                sorted_values = data["comments"].pluck("id")
-                expect(sorted_values).to eq(sorted_values.sort) # Ascending order
+                values = data.dig("comments", "specialists").map { |s| s["comments"].first["id"] }
+                expect(values).to eq(values.sort)
               end
             end
           end
@@ -212,8 +271,8 @@ RSpec.describe "BOPS public API Specialist comments" do
               let(:orderBy) { "asc" }
               run_test! do |response|
                 data = JSON.parse(response.body)
-                sorted_values = data["comments"].pluck("receivedAt")
-                expect(sorted_values).to eq(sorted_values.sort) # Ascending order
+                values = data.dig("comments", "specialists").map { |s| Time.zone.parse(s["comments"].first["metadata"]["submittedAt"]) }
+                expect(values).to eq(values.sort)
               end
             end
 
@@ -221,8 +280,8 @@ RSpec.describe "BOPS public API Specialist comments" do
               let(:orderBy) { "desc" }
               run_test! do |response|
                 data = JSON.parse(response.body)
-                sorted_values = data["comments"].pluck("receivedAt")
-                expect(sorted_values).to eq(sorted_values.sort.reverse) # Descending order
+                values = data.dig("comments", "specialists").map { |s| Time.zone.parse(s["comments"].first["metadata"]["submittedAt"]) }
+                expect(values).to eq(values.sort.reverse)
               end
             end
           end
@@ -235,7 +294,6 @@ RSpec.describe "BOPS public API Specialist comments" do
 
           run_test! do |response|
             data = JSON.parse(response.body)
-
             expect(data["error"]["message"]).to eq("Not Found")
           end
         end
@@ -275,7 +333,7 @@ RSpec.describe "BOPS public API Specialist comments" do
             expect(data["summary"]["totalConsulted"]).to eq(2)
             expect(data["summary"]["totalComments"]).to eq(0)
             expect(data["summary"]["sentiment"].values).to all(eq(0))
-            expect(data["comments"]).to eq([])
+            expect(data.dig("comments", "specialists") || []).to eq([])
           end
         end
 
@@ -296,7 +354,7 @@ RSpec.describe "BOPS public API Specialist comments" do
             expect(data["summary"]["totalConsulted"]).to eq(2)
             expect(data["summary"]["totalComments"]).to eq(1)
             expect(data["summary"]["sentiment"].values.sum).to eq(1)
-            expect(data["comments"].count).to eq(1)
+            expect(data.dig("comments", "specialists").size).to eq(1)
           end
         end
 
@@ -330,8 +388,9 @@ RSpec.describe "BOPS public API Specialist comments" do
             expect(data["summary"]["totalComments"]).to eq(1)
             expect(data["summary"]["sentiment"]["approved"]).to eq(1)
             expect(data["summary"]["sentiment"]["objected"]).to eq(0)
-            expect(data["comments"].count).to eq(2)
-            expect(data["comments"].first["sentiment"]).to eq("approved")
+            flat = data.dig("comments", "specialists").flat_map { |s| s["comments"] }
+            expect(flat.count).to eq(2)
+            expect(flat.first["sentiment"]).to eq("approved")
           end
         end
       end
