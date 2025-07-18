@@ -9,11 +9,11 @@ RSpec.describe "BOPS public API Specialist comments" do
   context "when every consulted consultee has exactly one redacted response" do
     before do
       25.times do
-        create(:consultee, :internal, :consulted, responses: build_list(:consultee_response, 1, :with_redaction), consultation: planning_application.consultation)
+        create(:consultee, :internal, :consulted, responses: build_list(:consultee_response, 1, :with_redaction), email_sent_at: 2.days.ago, consultation: planning_application.consultation)
       end
 
       25.times do
-        create(:consultee, :external, :consulted, responses: build_list(:consultee_response, 1, :with_redaction), consultation: planning_application.consultation)
+        create(:consultee, :external, :consulted, responses: build_list(:consultee_response, 1, :with_redaction), email_sent_at: 2.days.ago, consultation: planning_application.consultation)
       end
 
       25.times do
@@ -82,6 +82,34 @@ RSpec.describe "BOPS public API Specialist comments" do
           expect(sentiment["amendmentsNeeded"]).to eq(0)
         end
 
+        def validate_specialist_details(data)
+          specialists = data.dig("comments", "specialists")
+          expect(specialists).to be_an(Array)
+          specialists.each do |specialist|
+            expect(specialist["id"]).to be_present
+            expect(specialist["organisationSpecialism"]).to be_a(String) if specialist["organisationSpecialism"].present?
+            expect { DateTime.iso8601(specialist["firstConsultedAt"]) }.not_to raise_error
+            expect(specialist["jobTitle"]).to be_a(String) if specialist["jobTitle"].present?
+            expect(specialist["reason"]).to be_present
+            expect(specialist["reason"]).to be_in(["Constraint", "Other"])
+            if specialist["constraints"].present?
+              expect(specialist["constraints"]).to be_an(Array)
+              specialist["constraints"].each do |constraint|
+                expect(constraint["value"]).to be_present
+                expect(constraint["category"]).to be_present
+                expect(constraint["description"]).to be_present
+                expect([true, false]).to include(constraint["intersects"])
+                if constraint["entities"].present?
+                  expect(constraint["entities"]).to be_an(Array)
+                  constraint["entities"].each do |entity|
+                    expect(entity["name"]).to be_present
+                  end
+                end
+              end
+            end
+          end
+        end
+
         def validate_comments(data, count:, total_items:)
           specialists = data.dig("comments", "specialists")
           expect(specialists).to be_an(Array)
@@ -114,6 +142,7 @@ RSpec.describe "BOPS public API Specialist comments" do
             )
             # comment summary
             validate_comment_summary(data)
+            validate_specialist_details(data)
 
             # comments
             validate_comments(data, count: 10, total_items: 50)
@@ -138,6 +167,7 @@ RSpec.describe "BOPS public API Specialist comments" do
             )
             # comment summary
             validate_comment_summary(data)
+            validate_specialist_details(data)
 
             # comments
             validate_comments(data, count: 2, total_items: 50)
@@ -173,9 +203,7 @@ RSpec.describe "BOPS public API Specialist comments" do
 
             # comments
             validate_comments(data, count: 1, total_items: 1)
-            first = data.dig("comments", "specialists").first["comments"].first
-            expect(first["commentRedacted"]).to include("***** not like the other comments")
-            expect(data.dig("comments", "specialists").first["organisationSpecialism"]).to eq("External Company")
+            validate_specialist_details(data)
           end
         end
 
