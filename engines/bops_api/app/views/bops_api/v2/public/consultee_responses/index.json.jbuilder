@@ -11,6 +11,6 @@ json.summary do
   )
 end
 
-json.comments @comments do |comment|
-  json.partial! "bops_api/v2/shared/postsubmissionApplication/comments/comment_specialist", comment: comment
+json.comments do
+  json.partial! "bops_api/v2/shared/postsubmissionApplication/comments/comment_specialist", comments: @comments
 end
