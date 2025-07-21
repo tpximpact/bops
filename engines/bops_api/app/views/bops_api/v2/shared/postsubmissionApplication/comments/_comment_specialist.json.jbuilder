@@ -55,17 +55,22 @@ json.specialists do
           json.files resp.documents do |document|
             json.id document.id
             json.name document.file_attachment.filename
-            json.association "comment"
+            json.association "specialistComment"
+            # json.version
             json.type document.file_attachment.content_type
             json.url document.blob_url
+            json.thumbnailUrl document.representation_url if document.representation_url.present?
+            # json.referencesinDocument
+            # json.description
 
             json.metadata do
               json.size do
                 json.bytes document.file_attachment.blob.byte_size
               end
               json.mimeType document.file_attachment.blob.content_type
-              json.createdAt format_postsubmission_datetime(document.created_at)
-              json.submittedAt format_postsubmission_datetime(document.received_at)
+              json.createdAt format_postsubmission_datetime(document.created_at) if document.created_at
+              # json.validatedAt
+              json.submittedAt format_postsubmission_datetime(document.received_at) if document.received_at
             end
           end
         end
@@ -79,32 +84,3 @@ json.specialists do
     end
   end
 end
-
-# SpecialistComment
-
-# json.id comment.id
-# json.sentiment comment.summary_tag
-# json.comment comment.redacted_response
-# json.constraints "PlanningConstraint[]"
-# json.reason "string"
-# json.comment "string"
-# json.author "SpecialistCommentAuthor"
-# json.consultedAt "DateTime"
-# json.respondedAt "DateTime"
-# json.files "PostSubmissionFile[]"
-# json.responses "SpecialistComment[]"
-
-# json.author do
-#   json.name do
-#     json.singleLine comment.name
-#   end
-# #   json.organisation "string;"
-# #   json.specialism "string;"
-# #   json.jobTitle "string;"
-# end
-
-# json.metadata do
-#   json.submittedAt format_postsubmission_datetime(comment.created_at)
-#   # json.publishedAt format_postsubmission_datetime(comment.received_at)
-#   json.validAt format_postsubmission_datetime(comment.updated_at)
-# end
