@@ -25,7 +25,7 @@ module BopsApi
             objected: summary_counts["objected"] || 0,
             amendments_needed: summary_counts["amendments_needed"] || 0
           }
-          redacted_responses = @consultation.consultee_responses.redacted
+          redacted_responses = @consultation.consultee_responses.redacted.includes(consultee: {planning_application_constraints: :constraint})
           @total_available_items = redacted_responses.count
           @total_consulted = @consultation.consultees.consulted.count
 
