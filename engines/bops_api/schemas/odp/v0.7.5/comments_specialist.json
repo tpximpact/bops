@@ -32,29 +32,75 @@
       "required": ["totalComments", "totalConsulted", "sentiment"]
     },
     "comments": {
-      "type": "array",
-      "items": [
-        {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "integer"
+      "type": "object",
+      "properties": {
+        "specialists": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "organisationSpecialism": { "type": ["string", "null"] },
+              "jobTitle": { "type": ["string", "null"] },
+              "reason": { "type": "string" },
+              "constraints": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": { "type": "object" }
+                }
+              },
+              "firstConsultedAt": { "type": "string", "format": "date-time" },
+              "comments": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "sentiment": { "type": "string" },
+                    "commentRedacted": { "type": "string" },
+                    "files": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "string" },
+                          "fileName": { "type": "string" },
+                          "fileType": { "type": "string" },
+                          "url": { "type": "string", "format": "uri" },
+                          "byteSize": { "type": "integer" }
+                        },
+                        "required": ["id", "fileName"]
+                      }
+                    },
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "submittedAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "validatedAt": {
+                          "type": ["string", "null"],
+                          "format": "date-time"
+                        },
+                        "publishedAt": {
+                          "type": ["string", "null"],
+                          "format": "date-time"
+                        }
+                      },
+                      "required": ["submittedAt"]
+                    }
+                  },
+                  "required": ["id", "sentiment", "commentRedacted", "metadata"]
+                }
+              }
             },
-            "sentiment": {
-              "enum": ["approved", "amendmentsNeeded", "objected"],
-              "type": "string"
-            },
-            "comment": {
-              "type": "string"
-            },
-            "receivedAt": {
-              "format": "datetime",
-              "type": ["string", "null"]
-            }
-          },
-          "required": ["id", "sentiment", "comment", "receivedAt"]
+            "required": ["id", "firstConsultedAt", "comments"]
+          }
         }
-      ]
+      },
+      "required": ["specialists"]
     }
   },
   "required": ["pagination", "summary", "comments"]
